@@ -37,7 +37,7 @@ body {
     width: 100%;
     max-width: 650px;
     padding: 40px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
 }
 
 .navbar-brand {
@@ -49,8 +49,14 @@ body {
     color: var(--accent-color) !important;
 }
 
-.btn-primary { background-color: var(--accent-color); border: none; }
-.btn-primary:hover { background-color: var(--accent-hover); }
+.btn-primary {
+    background-color: var(--accent-color);
+    border: none;
+}
+
+.btn-primary:hover {
+    background-color: var(--accent-hover);
+}
 
 .back-arrow {
     font-size: 1.5rem;
@@ -69,6 +75,7 @@ body {
     height: 60px;
     margin-top: 20px;
 }
+
 /* dfffffffffffff */
 .eq-bar {
     width: 8px;
@@ -76,4 +83,13 @@ body {
     border-radius: 4px;
     animation: bounce 1s infinite alternate;
 }
-@keyframes bounce { from { height: 10px; } to { height: 50px; } }
+
+@keyframes bounce {
+    from {
+        height: 10px;
+    }
+
+    to {
+        height: 50px;
+    }
+}
