@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="position-relative w-100">
+    <a href="{{ url_for('index') }}" class="back-arrow">← Назад</a>
+    
+    <div class="custom-card mx-auto shadow-lg text-center">
+        <h4 class="mb-4">Создание ремиксов</h4>
+        
+        <div class="eq-container mb-4">
+            <div class="eq-bar" style="animation-delay: 0.1s"></div>
+            <div class="eq-bar" style="animation-delay: 0.3s"></div>
+            <div class="eq-bar" style="animation-delay: 0.2s"></div>
+            <div class="eq-bar" style="animation-delay: 0.5s"></div>
+            <div class="eq-bar" style="animation-delay: 0.4s"></div>
+        </div>
+
+        <form method="POST" enctype="multipart/form-data">
+            <div class="drop-zone py-5">
+                <p>Перетащите аудио-файл</p>
+                <input type="file" name="audio_file" accept="audio/*" class="form-control">
+            </div>
+            <button type="submit" class="btn btn-primary mt-4 w-100">Сохранить</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

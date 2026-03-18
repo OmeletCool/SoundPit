@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="text-center w-100">
+    <div class="custom-card mx-auto shadow-lg">
+        <div class="mb-3">
+            <input type="text" id="band_name" class="form-control form-control-lg text-center" placeholder="Название группы...">
+        </div>
+    </div>
+    <div class="mt-4">
+        <button onclick="location.href='/remix'" class="btn btn-primary btn-lg px-5 shadow">Редактирование</button>
+    </div>
+</div>
+{% endblock %}
