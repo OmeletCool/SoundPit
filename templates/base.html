@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ru" data-theme="dark">
+<html lang="{{ session.get('lang', 'ru') }}">
 <head>
     <meta charset="UTF-8">
     <title>Soundhole</title>
@@ -7,36 +7,40 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg py-3">
+    <nav class="navbar py-4">
         <div class="container position-relative">
-            <div id="theme-toggle">☀️</div>
-            <a class="navbar-brand text-uppercase" href="{{ url_for('index') }}">Soundhole</a>
-            
+            <div class="langs">
+                <a href="{{ url_for('set_lang', lang='ru') }}" class="text-white mx-2 text-decoration-none opacity-50">RU</a>
+                <a href="{{ url_for('set_lang', lang='en') }}" class="text-white mx-2 text-decoration-none opacity-50">EN</a>
+                <a href="{{ url_for('set_lang', lang='sq') }}" class="text-white mx-2 text-decoration-none opacity-50">SQ</a>
+            </div>
+            <a class="navbar-brand" href="{{ url_for('index') }}">Soundhole</a>
             <div class="ms-auto d-flex align-items-center">
-                <a href="{{ url_for('developers') }}" class="btn btn-link text-decoration-none" style="color: var(--text-color);">Разработчики</a>
+                <a href="{{ url_for('developers') }}" class="text-white text-decoration-none me-4">{{ txt.devs }}</a>
                 {% if session.get('user') %}
-                    <span class="user-display-name mx-3" data-bs-toggle="modal" data-bs-target="#nameModal">{{ session['display_name'] }}</span>
-                    <a href="{{ url_for('logout') }}" class="btn btn-sm btn-outline-danger">Выход</a>
+                    <span class="user-name me-3" data-bs-toggle="modal" data-bs-target="#nameModal" style="color: #9d4edd; cursor:pointer; font-weight: bold;">
+                        {{ session['display_name'] }}
+                    </span>
+                    <a href="{{ url_for('logout') }}" class="btn btn-sm btn-outline-danger">X</a>
                 {% endif %}
             </div>
         </div>
     </nav>
 
-    <div class="main-container">
-        <div class="container d-flex justify-content-center">
-            {% block content %}{% endblock %}
-        </div>
+    <div class="container d-flex justify-content-center align-items-center" style="min-height: 75vh;">
+        {% block content %}{% endblock %}
+    </div>
+
+    <div class="modal fade" id="nameModal" tabindex="-1">
+        <div class="modal-dialog"><div class="modal-content bg-dark text-white border-secondary">
+            <form action="{{ url_for('change_name') }}" method="POST">
+                <div class="modal-header"><h5>{{ txt.change_name }}</h5></div>
+                <div class="modal-body"><input type="text" name="new_name" class="input" placeholder="..." required></div>
+                <div class="modal-footer"><button class="btn btn-primary">{{ txt.save }}</button></div>
+            </form>
+        </div></div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        const toggleBtn = document.getElementById('theme-toggle');
-        const html = document.documentElement;
-        toggleBtn.addEventListener('click', () => {
-            const next = html.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
-            html.setAttribute('data-theme', next);
-            toggleBtn.innerText = next === 'light' ? '🌙' : '☀️';
-        });
-    </script>
 </body>
 </html>

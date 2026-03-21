@@ -1,26 +1,24 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="position-relative w-100">
-    <a href="{{ url_for('index') }}" class="back-arrow">← Назад</a>
-    
-    <div class="custom-card mx-auto shadow-lg text-center">
-        <h4 class="mb-4">Создание ремиксов</h4>
+<div class="w-100 text-center">
+    <div class="custom-card card-remix mx-auto shadow-lg">
+        <h1 class="gradient-title mb-4">{{ txt.remix_title }}</h1>
         
-        <div class="eq-container mb-4">
-            <div class="eq-bar" style="animation-delay: 0.1s"></div>
-            <div class="eq-bar" style="animation-delay: 0.3s"></div>
-            <div class="eq-bar" style="animation-delay: 0.2s"></div>
-            <div class="eq-bar" style="animation-delay: 0.5s"></div>
-            <div class="eq-bar" style="animation-delay: 0.4s"></div>
-        </div>
-
         <form method="POST" enctype="multipart/form-data">
-            <div class="drop-zone py-5">
-                <p>Перетащите аудио-файл</p>
-                <input type="file" name="audio_file" accept="audio/*" class="form-control">
+            <div class="drop-zone">
+                <input type="file" name="audio_file" accept=".mp3, .wav, .ogg, audio/mpeg, audio/wav, audio/ogg" 
+                       class="form-control form-control-lg bg-dark text-white border-0 mb-3" required>
+                <p class="opacity-50 mb-0">mp3, wav, ogg</p>
             </div>
-            <button type="submit" class="btn btn-primary mt-4 w-100">Сохранить</button>
+            
+            <div class="mt-4 mx-auto" style="max-width: 350px;">
+                <button type="submit" class="gradient-button">
+                    <span class="gradient-text">{{ txt.save }}</span>
+                </button>
+            </div>
         </form>
     </div>
 </div>
+
+<a href="{{ url_for('index') }}" class="btn-back">← {{ txt.back }}</a>
 {% endblock %}

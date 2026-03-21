@@ -1,95 +1,95 @@
-:root {
-    --bg-color: #f3f0f7;
-    --text-color: #2d1b4d;
-    --card-bg: #ffffff;
-    --navbar-bg: #ffffff;
-    --border-color: #d1c4e9;
-    --accent-color: #7b2cbf;
-    --accent-hover: #5a189a;
-}
-
-[data-theme="dark"] {
-    --bg-color: #0f0c15;
-    --text-color: #e0d7f2;
-    --card-bg: #1a1625;
-    --navbar-bg: #1a1625;
-    --border-color: #3c3352;
-}
-
+/* фон */
 body {
-    background-color: var(--bg-color);
-    color: var(--text-color);
-    transition: 0.3s;
-    min-height: 100vh;
+    margin: 0; min-height: 100vh; font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(-45deg, #020205, #0d051a, #050508, #15051f);
+    background-size: 400% 400%; animation: gradientBG 20s ease infinite; color: #e0d7f2;
 }
-
-.main-container {
-    min-height: calc(100vh - 150px);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.custom-card {
-    background-color: var(--card-bg);
-    border: 1px solid var(--border-color);
-    border-radius: 20px;
-    width: 100%;
-    max-width: 650px;
-    padding: 40px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-}
+@keyframes gradientBG { 0% {background-position: 0% 50%} 50% {background-position: 100% 50%} 100% {background-position: 0% 50%} }
 
 .navbar-brand {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    font-weight: 800;
-    letter-spacing: 1px;
-    color: var(--accent-color) !important;
+    position: absolute; left: 50%; transform: translateX(-50%);
+    font-size: 3rem; font-weight: 900;
+    color: #9d4edd; text-shadow: 0 0 20px rgba(157, 78, 221, 0.6);
 }
 
-.btn-primary {
-    background-color: var(--accent-color);
-    border: none;
+/* ввод */
+.input {
+    background-color: #1a1a1a; width: 100%; height: 50px; padding: 10px;
+    border: 2px solid white; border-radius: 8px; color: white; text-align: center; transition: .2s;
+}
+.input:focus { color: rgb(0, 255, 255); outline: none; border-color: rgb(0, 255, 255); box-shadow: -3px -3px 15px rgb(0, 255, 255); }
+.input:focus::placeholder { color: transparent; }
+
+/* переливающийся обод */
+.gradient-button {
+    position: relative; padding: 16px 32px; font-size: 18px; font-weight: bold;
+    color: white; background: transparent; border: none; cursor: pointer;
+    border-radius: 50px; overflow: hidden; transition: transform 0.2s ease; width: 100%;
+}
+.gradient-button::before {
+    content: ""; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+    background: conic-gradient(from 0deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4, #feca57, #ff9ff3, #ff6b6b);
+    z-index: -2; filter: blur(10px); animation: rotate 3s linear infinite;
+}
+@keyframes rotate { from { transform: rotate(0deg) } to { transform: rotate(360deg) } }
+.gradient-button::after { content: ""; position: absolute; inset: 3px; background: #000; border-radius: 47px; z-index: -1; }
+.gradient-text { color: transparent; background: conic-gradient(from 0deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4, #feca57, #ff9ff3, #ff6b6b); -webkit-background-clip: text; background-clip: text; }
+
+/* кнопка регистрации */
+.btn-reg {
+  --border-color: linear-gradient(-45deg, #ffae00, #7e03aa, #00fffb);
+  --border-width: 0.125em; --curve-size: 0.5em; --bg: #080312; --color: #afffff;
+  color: var(--color); cursor: pointer; position: relative; isolation: isolate;
+  display: inline-grid; place-content: center; padding: 0.8em 2em; font-size: 17px;
+  border: 0; text-transform: uppercase; width: 100%;
+  clip-path: polygon(0% var(--curve-size), var(--curve-size) 0, 100% 0, 100% calc(100% - var(--curve-size)), calc(100% - var(--curve-size)) 100%, 0 100%);
+  transition: color 250ms;
+}
+.btn-reg::before { background: var(--border-color); background-size: 300% 300%; animation: move-bg 5s ease infinite; content: ""; position: absolute; inset: 0; z-index: -2; }
+@keyframes move-bg { 0% { background-position: 31% 0% } 50% { background-position: 70% 100% } 100% { background-position: 31% 0% } }
+.btn-reg::after {
+  background: var(--bg); content: ""; position: absolute; inset: 0; z-index: -1;
+  clip-path: polygon(var(--border-width) calc(var(--curve-size) + var(--border-width) * 0.5), calc(var(--curve-size) + var(--border-width) * 0.5) var(--border-width), calc(100% - var(--border-width)) var(--border-width), calc(100% - var(--border-width)) calc(100% - calc(var(--curve-size) + var(--border-width) * 0.5)), calc(100% - calc(var(--curve-size) + var(--border-width) * 0.5)) calc(100% - var(--border-width)), var(--border-width) calc(100% - var(--border-width)));
+  transition: clip-path 500ms;
+}
+.btn-reg:hover::after { clip-path: polygon(calc(100% - var(--border-width)) calc(100% - calc(var(--curve-size) + var(--border-width) * 0.5)), calc(100% - var(--border-width)) var(--border-width), calc(100% - var(--border-width)) var(--border-width), calc(100% - var(--border-width)) calc(100% - calc(var(--curve-size) + var(--border-width) * 0.5)), calc(100% - calc(var(--curve-size) + var(--border-width) * 0.5)) calc(100% - var(--border-width)), calc(100% - calc(var(--curve-size) + var(--border-width) * 0.5)) calc(100% - var(--border-width))); }
+
+/* отпрыски */
+.custom-card { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 30px; padding: 40px; }
+.btn-back { position: fixed; bottom: 30px; left: 30px; background: rgba(255,255,255,0.05); color: white; padding: 8px 20px; border-radius: 12px; text-decoration: none; border: 1px solid rgba(255,255,255,0.1); transition: 0.3s; }
+.btn-back:hover { background: #9d4edd; }
+
+.card-auth {
+    max-width: 550px;
+    width: 100%;
 }
 
-.btn-primary:hover {
-    background-color: var(--accent-hover);
+.card-remix {
+    max-width: 850px; 
+    padding: 40px;
 }
 
-.back-arrow {
-    font-size: 1.5rem;
-    color: var(--accent-color);
-    text-decoration: none;
-    position: absolute;
-    top: 20px;
-    left: 20px;
+.gradient-title {
+    font-size: 2.9rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    background: conic-gradient(from 0deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4, #feca57, #ff9ff3, #ff6b6b);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: rotate-text 4s linear infinite;
+    display: inline-block;
 }
 
-/* Заглушка под эквалайзер*/
-.eq-container {
-    display: flex;
-    justify-content: space-around;
-    align-items: flex-end;
-    height: 60px;
-    margin-top: 20px;
+@keyframes rotate-text {
+    from { filter: hue-rotate(0deg); }
+    to { filter: hue-rotate(360deg); }
 }
 
-/* dfffffffffffff */
-.eq-bar {
-    width: 8px;
-    background: var(--accent-color);
-    border-radius: 4px;
-    animation: bounce 1s infinite alternate;
-}
-
-@keyframes bounce {
-    from {
-        height: 10px;
-    }
-
-    to {
-        height: 50px;
-    }
+.drop-zone {
+    border: 3px dashed rgba(157, 78, 221, 0.3);
+    border-radius: 30px;
+    padding: 50px;
+    background: rgba(0,0,0,0.3);
+    transition: 0.3s;
 }

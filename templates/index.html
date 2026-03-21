@@ -1,13 +1,18 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="text-center w-100">
-    <div class="custom-card mx-auto shadow-lg">
-        <div class="mb-3">
-            <input type="text" id="band_name" class="form-control form-control-lg text-center" placeholder="Название группы...">
-        </div>
+<div class="w-100 text-center">
+    <div class="custom-card mx-auto shadow-lg" style="max-width: 650px;">
+        <form>
+            <div class="mb-4">
+                <input placeholder="{{ txt.search_place }}" class="input" type="text">
+            </div>
+            <button type="submit" class="gradient-button">
+                <span class="gradient-text">{{ txt.send }}</span>
+            </button>
+        </form>
     </div>
     <div class="mt-4">
-        <button onclick="location.href='/remix'" class="btn btn-primary btn-lg px-5 shadow">Редактирование</button>
+        <a href="/remix" class="text-decoration-none fw-bold" style="color: #9d4edd; letter-spacing: 1px;">{{ txt.remix_title }}</a>
     </div>
 </div>
 {% endblock %}
