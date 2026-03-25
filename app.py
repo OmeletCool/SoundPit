@@ -1,75 +1,102 @@
-import re
-import io
-from flask import Flask, render_template, request, redirect, url_for, session, send_file
-from werkzeug.utils import secure_filename
-from backend.database.csv_manager import init_db, register_user, verify_user, update_display_name
+import os
+import random
+from flask import Flask, render_template, request, redirect, url_for, session, flash
+from backend.database import db_session
+from backend.database.models.users_model import UserModel
+from backend.database.default_data import default_data
+from backend.forms.user_forms import LoginForm, RegisterForm
 
 app = Flask(__name__)
 app.secret_key = 'neon_music_crm_secret'
 
 TRANSLATIONS = {
-    'ru': {'devs': 'Разработчики', 'send': 'Отправить', 'login': 'Войти', 'reg': 'Регистрация', 'back': 'Назад', 'save': 'Сохранить', 'remix_title': 'Студия Ремиксов', 'search_place': 'Например: Alice in Chains', 'change_name': 'Сменить имя'},
-    'en': {'devs': 'Developers', 'send': 'Submit', 'login': 'Login', 'reg': 'Register', 'back': 'Back', 'save': 'Save', 'remix_title': 'Remix Studio', 'search_place': 'For example: Alice in Chains', 'change_name': 'Change Name'},
-    'sq': {'devs': 'Zhvilluesit', 'send': 'Dërgo', 'login': 'Hyrje', 'reg': 'Regjistrohu', 'back': 'Prapa', 'save': 'Ruaj', 'remix_title': 'Studio Remix', 'search_place': 'Shembull: Alice in Chains', 'change_name': 'Ndrysho emrin'}
+    'ru': {'devs': 'Разработчики', 'send': 'Отправить', 'login': 'Войти', 'reg': 'Регистрация', 'back': 'Назад', 'search_place': 'НАПРИМЕР: БЛА БЛА БЛА'},
+    'en': {'devs': 'Developers', 'send': 'Submit', 'login': 'Login', 'reg': 'Register', 'back': 'Back', 'search_place': 'EXAMPLE: BLA BLA BLA'},
+    'sq': {'devs': 'Zhvilluesit', 'send': 'Dërgo', 'login': 'Hyrje', 'reg': 'Regjistrohu', 'back': 'Prapa', 'search_place': 'SHEMBULL: BLA BLA BLA'}
 }
-
 @app.context_processor
 def inject_vars():
     lang = session.get('lang', 'ru')
     return dict(txt=TRANSLATIONS.get(lang, TRANSLATIONS['ru']))
 
+@app.route('/')
+def index():
+    return render_template('index.html')
+
+@app.route('/action_gateway', methods=['POST'])
+def change_name():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    return redirect(url_for('index'))
+
 @app.route('/set_lang/<lang>')
 def set_lang(lang):
-    if lang in TRANSLATIONS: session['lang'] = lang
+    if lang in TRANSLATIONS:
+        session['lang'] = lang
+    # Возвращаемся туда, откуда пришли, или на главную
     return redirect(request.referrer or url_for('index'))
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    if request.method == 'POST':
-        action = request.form.get('action')
-        u, p = request.form.get('username', ''), request.form.get('password', '')
-        if re.match(r'^[a-zA-Z0-9_]{1,20}$', u):
-            if action == 'register':
-                if register_user(u, p):
-                    session['user'] = session['display_name'] = u
-                    return redirect(url_for('index'))
-            else:
-                user = verify_user(u, p)
-                if user:
-                    session['user'], session['display_name'] = user['username'], user['display_name']
-                    return redirect(url_for('index'))
-    return render_template('login.html')
+    login_form = LoginForm()
+    reg_form = RegisterForm()
+    
+    # Обработка ВХОДА
+    if 'submit_login' in request.form and login_form.validate_on_submit():
+        db_sess = db_session.create_session()
+        user = db_sess.query(UserModel).filter(UserModel.username == login_form.username.data).first()
+        if user and user.check_password(login_form.password.data):
+            session['user_id'] = user.id
+            session['display_name'] = user.name
+            session['role'] = user.role
+            return redirect(url_for('admin_panel' if user.role == 'admin' else 'index'))
+        return render_template('login.html', login_form=login_form, reg_form=reg_form, error="Неверный логин или пароль", active_tab='login')
 
-@app.route('/change_name', methods=['POST'])
-def change_name():
-    new_name = request.form.get('new_name')
-    if new_name and 'user' in session:
-        update_display_name(session['user'], new_name)
-        session['display_name'] = new_name
-    return redirect(request.referrer)
+    # Обработка РЕГИСТРАЦИИ
+    if 'submit_register' in request.form and reg_form.validate_on_submit():
+        if reg_form.password.data != reg_form.password_again.data:
+            return render_template('login.html', login_form=login_form, reg_form=reg_form, error="Пароли не совпадают", active_tab='register')
+        
+        db_sess = db_session.create_session()
+        if db_sess.query(UserModel).filter(UserModel.email == reg_form.email.data).first():
+            return render_template('login.html', login_form=login_form, reg_form=reg_form, error="Такая почта уже есть", active_tab='register')
+            
+        role = request.form.get('role', 'user')
+        user = UserModel(
+            username=reg_form.username.data,
+            name=reg_form.name.data,
+            email=reg_form.email.data,
+            about=reg_form.about.data,
+            role=role,
+            funds=random.randint(1000, 20000) if role == 'band' else 0
+        )
+        user.set_password(reg_form.password.data)
+        db_sess.add(user)
+        db_sess.commit()
+        
+        session['user_id'] = user.id
+        session['display_name'] = user.name
+        session['role'] = user.role
+        return redirect(url_for('index'))
 
-@app.route('/')
-def index():
-    if 'user' not in session: return redirect(url_for('login'))
-    return render_template('index.html')
+    return render_template('login.html', login_form=login_form, reg_form=reg_form, active_tab='login')
 
-@app.route('/remix', methods=['GET', 'POST'])
-def remix():
-    if 'user' not in session: return redirect(url_for('login'))
-    if request.method == 'POST':
-        file = request.files.get('audio_file')
-        if file and file.filename != '':
-            return send_file(io.BytesIO(file.read()), mimetype=file.mimetype, as_attachment=True, download_name=f"remix_{secure_filename(file.filename)}")
-    return render_template('remix.html')
-
-@app.route('/developers')
-def developers(): return render_template('developers.html')
+@app.route('/admin')
+def developers():
+    if session.get('role') != 'admin':
+        return redirect(url_for('index'))
+    db_sess = db_session.create_session()
+    bands = db_sess.query(UserModel).filter(UserModel.role == 'band').all()
+    return render_template('admin.html', bands=bands)
 
 @app.route('/logout')
 def logout():
     session.clear()
-    return redirect(url_for('login'))
+    return redirect(url_for('index'))
 
 if __name__ == '__main__':
-    init_db()
+    # Инициализация БД
+    os.makedirs('db', exist_ok=True)
+    db_session.global_init("db/music_crm.sqlite")
+    default_data() # Создаем админа
     app.run(debug=True)
