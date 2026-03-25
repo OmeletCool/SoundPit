@@ -1,11 +1,84 @@
 {% extends 'base.html' %}
+
 {% block content %}
-<div class="custom-card text-center">
-    <h1>{{ txt.team }}</h1>
-    <p class="mt-4 opacity-75">Долженков Михаил</p>
-    <p class="mt-4 opacity-75">Крадинов Дмитрий</p>
-    <p class="mt-4 opacity-75">   </p>
-    <p class="mt-4 opacity-75">Малы да удалы</p>
-    <a href="{{ url_for('index') }}" class="btn btn-outline-primary mt-5">{{ txt.back }}</a>
+<div class="container">
+    <h2 class="gradient-title mb-4">ПАНЕЛЬ РАЗРАБОТЧИКА</h2>
+    
+    <!-- Заявки на проверку -->
+    <div class="custom-card mb-4">
+        <h3 class="text-warning">📋 Заявки на проверку ({{ pending_bands|length }})</h3>
+        {% if pending_bands %}
+            <div class="table-responsive">
+                <table class="table table-dark">
+                    <thead>
+                        <tr>
+                            <th>Группа</th>
+                            <th>Логин</th>
+                            <th>ИНН</th>
+                            <th>РКН</th>
+                            <th>Документы</th>
+                            <th>Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for band in pending_bands %}
+                        <tr>
+                            <td>{{ band.name }}</td>
+                            <td>{{ band.username }}</td>
+                            <td>{{ band.inn or '-' }}</td>
+                            <td>{{ band.rkn_number or '-' }}</td>
+                            <td>
+                                {% if band.docs_path %}
+                                <a href="{{ band.docs_path }}" class="btn btn-sm btn-info" download>📄 Скачать</a>
+                                {% else %}
+                                -
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a href="{{ url_for('approve_band', band_id=band.id) }}" class="btn btn-sm btn-success">✓</a>
+                                <a href="{{ url_for('reject_band', band_id=band.id) }}" class="btn btn-sm btn-danger">✕</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <p class="text-white-50">Нет новых заявок</p>
+        {% endif %}
+    </div>
+    
+    <!-- Подтверждённые группы -->
+    <div class="custom-card">
+        <h3 class="text-success">✅ Подтверждённые группы ({{ approved_bands|length }})</h3>
+        {% if approved_bands %}
+            <div class="table-responsive">
+                <table class="table table-dark">
+                    <thead>
+                        <tr>
+                            <th>Группа</th>
+                            <th>Логин</th>
+                            <th>Дата регистрации</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for band in approved_bands %}
+                        <tr>
+                            <td>{{ band.name }}</td>
+                            <td>{{ band.username }}</td>
+                            <td>{{ band.created_date.strftime('%d.%m.%Y') if band.created_date else '-' }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <p class="text-white-50">Нет подтверждённых групп</p>
+        {% endif %}
+    </div>
+    
+    <div class="mt-4">
+        <a href="{{ url_for('index') }}" class="btn-back">{{ txt.back }}</a>
+    </div>
 </div>
 {% endblock %}

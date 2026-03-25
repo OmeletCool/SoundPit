@@ -1,63 +1,202 @@
 /* фон */
 body {
-    margin: 0; min-height: 100vh; font-family: 'Segoe UI', sans-serif;
+    margin: 0;
+    min-height: 100vh;
+    font-family: 'Segoe UI', sans-serif;
     background: linear-gradient(-45deg, #020205, #0d051a, #050508, #15051f);
-    background-size: 400% 400%; animation: gradientBG 20s ease infinite; color: #e0d7f2;
+    background-size: 400% 400%;
+    animation: gradientBG 20s ease infinite;
+    color: #e0d7f2;
 }
-@keyframes gradientBG { 0% {background-position: 0% 50%} 50% {background-position: 100% 50%} 100% {background-position: 0% 50%} }
+
+@keyframes gradientBG {
+    0% {
+        background-position: 0% 50%
+    }
+
+    50% {
+        background-position: 100% 50%
+    }
+
+    100% {
+        background-position: 0% 50%
+    }
+}
 
 .navbar-brand {
-    position: absolute; left: 50%; transform: translateX(-50%);
-    font-size: 3rem; font-weight: 900;
-    color: #9d4edd; text-shadow: 0 0 20px rgba(157, 78, 221, 0.6);
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 3rem;
+    font-weight: 900;
+    color: #9d4edd;
+    text-shadow: 0 0 20px rgba(157, 78, 221, 0.6);
 }
 
 /* ввод */
 .input {
-    background-color: #1a1a1a; width: 100%; height: 50px; padding: 10px;
-    border: 2px solid white; border-radius: 8px; color: white; text-align: center; transition: .2s;
+    background-color: #1a1a1a;
+    width: 100%;
+    height: 50px;
+    padding: 10px;
+    border: 2px solid white;
+    border-radius: 8px;
+    color: white;
+    text-align: center;
+    transition: .2s;
 }
-.input:focus { color: rgb(0, 255, 255); outline: none; border-color: rgb(0, 255, 255); box-shadow: -3px -3px 15px rgb(0, 255, 255); }
-.input:focus::placeholder { color: transparent; }
+
+.input:focus {
+    color: rgb(0, 255, 255);
+    outline: none;
+    border-color: rgb(0, 255, 255);
+    box-shadow: -3px -3px 15px rgb(0, 255, 255);
+}
+
+.input:focus::placeholder {
+    color: transparent;
+}
 
 /* переливающийся обод */
 .gradient-button {
-    position: relative; padding: 16px 32px; font-size: 18px; font-weight: bold;
-    color: white; background: transparent; border: none; cursor: pointer;
-    border-radius: 50px; overflow: hidden; transition: transform 0.2s ease; width: 100%;
+    position: relative;
+    padding: 16px 32px;
+    font-size: 18px;
+    font-weight: bold;
+    color: white;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    border-radius: 50px;
+    overflow: hidden;
+    transition: transform 0.2s ease;
+    width: 100%;
 }
+
 .gradient-button::before {
-    content: ""; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+    content: "";
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
     background: conic-gradient(from 0deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4, #feca57, #ff9ff3, #ff6b6b);
-    z-index: -2; filter: blur(10px); animation: rotate 3s linear infinite;
+    z-index: -2;
+    filter: blur(10px);
+    animation: rotate 3s linear infinite;
 }
-@keyframes rotate { from { transform: rotate(0deg) } to { transform: rotate(360deg) } }
-.gradient-button::after { content: ""; position: absolute; inset: 3px; background: #000; border-radius: 47px; z-index: -1; }
-.gradient-text { color: transparent; background: conic-gradient(from 0deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4, #feca57, #ff9ff3, #ff6b6b); -webkit-background-clip: text; background-clip: text; }
+
+@keyframes rotate {
+    from {
+        transform: rotate(0deg)
+    }
+
+    to {
+        transform: rotate(360deg)
+    }
+}
+
+.gradient-button::after {
+    content: "";
+    position: absolute;
+    inset: 3px;
+    background: #000;
+    border-radius: 47px;
+    z-index: -1;
+}
+
+.gradient-text {
+    color: transparent;
+    background: conic-gradient(from 0deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4, #feca57, #ff9ff3, #ff6b6b);
+    -webkit-background-clip: text;
+    background-clip: text;
+}
 
 /* кнопка регистрации */
 .btn-reg {
-  --border-color: linear-gradient(-45deg, #ffae00, #7e03aa, #00fffb);
-  --border-width: 0.125em; --curve-size: 0.5em; --bg: #080312; --color: #afffff;
-  color: var(--color); cursor: pointer; position: relative; isolation: isolate;
-  display: inline-grid; place-content: center; padding: 0.8em 2em; font-size: 17px;
-  border: 0; text-transform: uppercase; width: 100%;
-  clip-path: polygon(0% var(--curve-size), var(--curve-size) 0, 100% 0, 100% calc(100% - var(--curve-size)), calc(100% - var(--curve-size)) 100%, 0 100%);
-  transition: color 250ms;
+    --border-color: linear-gradient(-45deg, #ffae00, #7e03aa, #00fffb);
+    --border-width: 0.125em;
+    --curve-size: 0.5em;
+    --bg: #080312;
+    --color: #afffff;
+    color: var(--color);
+    cursor: pointer;
+    position: relative;
+    isolation: isolate;
+    display: inline-grid;
+    place-content: center;
+    padding: 0.8em 2em;
+    font-size: 17px;
+    border: 0;
+    text-transform: uppercase;
+    width: 100%;
+    clip-path: polygon(0% var(--curve-size), var(--curve-size) 0, 100% 0, 100% calc(100% - var(--curve-size)), calc(100% - var(--curve-size)) 100%, 0 100%);
+    transition: color 250ms;
 }
-.btn-reg::before { background: var(--border-color); background-size: 300% 300%; animation: move-bg 5s ease infinite; content: ""; position: absolute; inset: 0; z-index: -2; }
-@keyframes move-bg { 0% { background-position: 31% 0% } 50% { background-position: 70% 100% } 100% { background-position: 31% 0% } }
+
+.btn-reg::before {
+    background: var(--border-color);
+    background-size: 300% 300%;
+    animation: move-bg 5s ease infinite;
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+}
+
+@keyframes move-bg {
+    0% {
+        background-position: 31% 0%
+    }
+
+    50% {
+        background-position: 70% 100%
+    }
+
+    100% {
+        background-position: 31% 0%
+    }
+}
+
 .btn-reg::after {
-  background: var(--bg); content: ""; position: absolute; inset: 0; z-index: -1;
-  clip-path: polygon(var(--border-width) calc(var(--curve-size) + var(--border-width) * 0.5), calc(var(--curve-size) + var(--border-width) * 0.5) var(--border-width), calc(100% - var(--border-width)) var(--border-width), calc(100% - var(--border-width)) calc(100% - calc(var(--curve-size) + var(--border-width) * 0.5)), calc(100% - calc(var(--curve-size) + var(--border-width) * 0.5)) calc(100% - var(--border-width)), var(--border-width) calc(100% - var(--border-width)));
-  transition: clip-path 500ms;
+    background: var(--bg);
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    clip-path: polygon(var(--border-width) calc(var(--curve-size) + var(--border-width) * 0.5), calc(var(--curve-size) + var(--border-width) * 0.5) var(--border-width), calc(100% - var(--border-width)) var(--border-width), calc(100% - var(--border-width)) calc(100% - calc(var(--curve-size) + var(--border-width) * 0.5)), calc(100% - calc(var(--curve-size) + var(--border-width) * 0.5)) calc(100% - var(--border-width)), var(--border-width) calc(100% - var(--border-width)));
+    transition: clip-path 500ms;
 }
-.btn-reg:hover::after { clip-path: polygon(calc(100% - var(--border-width)) calc(100% - calc(var(--curve-size) + var(--border-width) * 0.5)), calc(100% - var(--border-width)) var(--border-width), calc(100% - var(--border-width)) var(--border-width), calc(100% - var(--border-width)) calc(100% - calc(var(--curve-size) + var(--border-width) * 0.5)), calc(100% - calc(var(--curve-size) + var(--border-width) * 0.5)) calc(100% - var(--border-width)), calc(100% - calc(var(--curve-size) + var(--border-width) * 0.5)) calc(100% - var(--border-width))); }
+
+.btn-reg:hover::after {
+    clip-path: polygon(calc(100% - var(--border-width)) calc(100% - calc(var(--curve-size) + var(--border-width) * 0.5)), calc(100% - var(--border-width)) var(--border-width), calc(100% - var(--border-width)) var(--border-width), calc(100% - var(--border-width)) calc(100% - calc(var(--curve-size) + var(--border-width) * 0.5)), calc(100% - calc(var(--curve-size) + var(--border-width) * 0.5)) calc(100% - var(--border-width)), calc(100% - calc(var(--curve-size) + var(--border-width) * 0.5)) calc(100% - var(--border-width)));
+}
 
 /* отпрыски */
-.custom-card { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 30px; padding: 40px; }
-.btn-back { position: fixed; bottom: 30px; left: 30px; background: rgba(255,255,255,0.05); color: white; padding: 8px 20px; border-radius: 12px; text-decoration: none; border: 1px solid rgba(255,255,255,0.1); transition: 0.3s; }
-.btn-back:hover { background: #9d4edd; }
+.custom-card {
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 30px;
+    padding: 40px;
+}
+
+.btn-back {
+    position: fixed;
+    bottom: 30px;
+    left: 30px;
+    background: rgba(255, 255, 255, 0.05);
+    color: white;
+    padding: 8px 20px;
+    border-radius: 12px;
+    text-decoration: none;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: 0.3s;
+}
+
+.btn-back:hover {
+    background: #9d4edd;
+}
 
 .card-auth {
     max-width: 550px;
@@ -65,7 +204,7 @@ body {
 }
 
 .card-remix {
-    max-width: 850px; 
+    max-width: 850px;
     padding: 40px;
 }
 
@@ -82,14 +221,105 @@ body {
 }
 
 @keyframes rotate-text {
-    from { filter: hue-rotate(0deg); }
-    to { filter: hue-rotate(360deg); }
+    from {
+        filter: hue-rotate(0deg);
+    }
+
+    to {
+        filter: hue-rotate(360deg);
+    }
 }
 
 .drop-zone {
     border: 3px dashed rgba(157, 78, 221, 0.3);
     border-radius: 30px;
     padding: 50px;
-    background: rgba(0,0,0,0.3);
+    background: rgba(0, 0, 0, 0.3);
     transition: 0.3s;
+}
+
+.auth-card {
+    background: #111;
+    border: 1px solid #333;
+    padding: 30px;
+    border-radius: 20px;
+    max-width: 400px;
+}
+
+.role-selector {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+.role-option input[type="radio"] {
+    accent-color: #9d4edd;
+    /* Фиолетовый неон */
+    transform: scale(1.2);
+}
+
+.auth-input {
+    width: 100%;
+    background: #000;
+    border: 1px solid #444;
+    color: white;
+    padding: 12px;
+    border-radius: 10px;
+}
+
+.btn-neon-wide {
+    width: 100%;
+    background: linear-gradient(45deg, #9d4edd, #5a189a);
+    border: none;
+    color: white;
+    padding: 12px;
+    border-radius: 10px;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+/* Новые стили для форм */
+.role-tabs {
+    display: flex;
+    justify-content: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.role-btn {
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.4);
+    padding: 10px 20px;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+.role-btn.active {
+    color: #9d4edd;
+    border-bottom: 2px solid #9d4edd;
+}
+
+.role-radio {
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: 0.3s;
+}
+
+.role-radio:hover {
+    color: #9d4edd;
+}
+
+.upload-box {
+    border: 1px dashed rgba(255, 255, 255, 0.2);
+    padding: 15px;
+    border-radius: 10px;
+    background: rgba(0, 0, 0, 0.2);
+}
+
+/* Фикс для навигации */
+.user-name {
+    padding: 5px 15px;
+    background: rgba(157, 78, 221, 0.1);
+    border-radius: 20px;
+    border: 1px solid rgba(157, 78, 221, 0.3);
 }

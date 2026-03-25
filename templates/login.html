@@ -1,73 +1,135 @@
 {% extends 'base.html' %}
+
 {% block content %}
-<div class="custom-card card-auth text-center shadow-lg">
-    
-    <div class="role-tabs mb-4">
-        <button type="button" class="role-btn {% if active_tab != 'register' %}active{% endif %}" onclick="switchAuth('login')">ВХОД</button>
-        <button type="button" class="role-btn {% if active_tab == 'register' %}active{% endif %}" onclick="switchAuth('register')">РЕГИСТРАЦИЯ</button>
-    </div>
-
-    {% if error %}
-        <div class="alert alert-danger" style="background: rgba(255,0,0,0.2); border: 1px solid red; color: white;">{{ error }}</div>
-    {% endif %}
-
-    <div id="loginForm" style="display: {% if active_tab == 'register' %}none{% else %}block{% endif %};">
-        <form method="POST">
-            {{ login_form.hidden_tag() }}
-            <div class="mb-3">
-                {{ login_form.username(class="input", placeholder="ЛОГИН") }}
-            </div>
-            <div class="mb-4">
-                {{ login_form.password(class="input", placeholder="ПАРОЛЬ") }}
-            </div>
-            <button type="submit" name="submit_login" class="gradient-button">
-                <span class="gradient-text">{{ txt.login }}</span>
-            </button>
-        </form>
-    </div>
-
-    <div id="registerForm" style="display: {% if active_tab == 'register' %}block{% else %}none{% endif %};">
-        <form method="POST" enctype="multipart/form-data">
-            {{ reg_form.hidden_tag() }}
-            
-            <div class="d-flex justify-content-center gap-3 mb-3">
-                <label class="text-white"><input type="radio" name="role" value="user" checked onclick="toggleDocs(false)"> Обыватель</label>
-                <label class="text-white"><input type="radio" name="role" value="band" onclick="toggleDocs(true)"> Группа</label>
-            </div>
-
-            <div class="mb-3">{{ reg_form.username(class="input", placeholder="ЛОГИН") }}</div>
-            <div class="mb-3">{{ reg_form.email(class="input", placeholder="EMAIL") }}</div>
-            <div class="mb-3">{{ reg_form.name(class="input", placeholder="ИМЯ / НАЗВАНИЕ ГРУППЫ") }}</div>
-            <div class="mb-3">{{ reg_form.password(class="input", placeholder="ПАРОЛЬ") }}</div>
-            <div class="mb-3">{{ reg_form.password_again(class="input", placeholder="ПОВТОРИТЕ ПАРОЛЬ") }}</div>
-            <div class="mb-3">{{ reg_form.about(class="input", placeholder="НЕМНОГО О СЕБЕ", style="height: 80px;") }}</div>
-            
-            <div id="bandDocs" class="mb-4" style="display: none;">
-                <div style="border: 2px dashed rgba(255,255,255,0.2); border-radius: 10px; padding: 20px; background: rgba(0,0,0,0.3);">
-                    <p class="opacity-50 small mb-2">ПРИКРЕПИТЕ ДОКУМЕНТЫ</p>
-                    <input type="file" multiple class="form-control bg-dark text-white border-secondary">
+<div class="container d-flex justify-content-center align-items-center" style="min-height: 80vh;">
+    <div class="custom-card card-auth">
+        <h2 class="gradient-title text-center mb-4">SOUNDHOLE</h2>
+        
+        <!-- Вкладки -->
+        <div class="role-tabs mb-4">
+            <button class="role-btn active" onclick="switchTab('login')">ВХОД</button>
+            <button class="role-btn" onclick="switchTab('register')">РЕГИСТРАЦИЯ</button>
+        </div>
+        
+        <!-- Форма входа -->
+        <div id="login-tab">
+            <form method="POST" class="auth-form">
+                {{ login_form.hidden_tag() }}
+                <div class="mb-3">
+                    {{ login_form.username(class="input", placeholder="ЛОГИН") }}
                 </div>
-            </div>
-
-            <button type="submit" name="submit_register" class="btn-reg">
-                {{ txt.reg }}
-            </button>
-        </form>
+                <div class="mb-3">
+                    {{ login_form.password(class="input", placeholder="ПАРОЛЬ") }}
+                </div>
+                {% if error and active_tab == 'login' %}
+                <div class="alert alert-danger">{{ error }}</div>
+                {% endif %}
+                <button type="submit" name="submit_login" class="btn-reg mt-3">
+                    {{ login_form.submit.label.text }}
+                </button>
+            </form>
+        </div>
+        
+        <!-- Форма регистрации -->
+        <div id="register-tab" style="display: none;">
+            <form method="POST" enctype="multipart/form-data" class="auth-form">
+                {{ reg_form.hidden_tag() }}
+                
+                <!-- Выбор роли -->
+                <div class="mb-3">
+                    <label class="text-white-50 small">ТИП АККАУНТА</label>
+                    <div class="role-selector mt-2">
+                        <label class="role-radio">
+                            <input type="radio" name="role" value="user" checked onchange="toggleBandFields()">
+                            Слушатель
+                        </label>
+                        <label class="role-radio">
+                            <input type="radio" name="role" value="band" onchange="toggleBandFields()">
+                            Муз. Группа
+                        </label>
+                        <label class="role-radio">
+                            <input type="radio" name="role" value="admin" onchange="toggleBandFields()">
+                            Разработчик
+                        </label>
+                    </div>
+                </div>
+                
+                <!-- Основные поля -->
+                <div class="mb-3">
+                    {{ reg_form.username(class="input", placeholder="ПРИДУМАЙТЕ ЛОГИН") }}
+                </div>
+                <div class="mb-3">
+                    {{ reg_form.name(class="input", placeholder="ИМЯ / НАЗВАНИЕ ГРУППЫ") }}
+                </div>
+                <div class="mb-3">
+                    {{ reg_form.email(class="input", placeholder="ВАША ПОЧТА") }}
+                </div>
+                <div class="mb-3">
+                    {{ reg_form.password(class="input", placeholder="ПАРОЛЬ") }}
+                </div>
+                <div class="mb-3">
+                    {{ reg_form.password_again(class="input", placeholder="ПОВТОР ПАРОЛЯ") }}
+                </div>
+                <div class="mb-3">
+                    {{ reg_form.about(class="input", placeholder="О СЕБЕ / О ГРУППЕ", rows="3") }}
+                </div>
+                
+                <!-- Поля для групп -->
+                <div id="band-fields" style="display: none;">
+                    <div class="mb-3">
+                        {{ reg_form.inn(class="input", placeholder="ИНН") }}
+                    </div>
+                    <div class="mb-3">
+                        {{ reg_form.rkn_number(class="input", placeholder="РЕГИСТРАЦИОННЫЙ НОМЕР РКН") }}
+                    </div>
+                    <div class="mb-3">
+                        {{ reg_form.band_email(class="input", placeholder="EMAIL ПРЕДСТАВИТЕЛЯ") }}
+                    </div>
+                    <div class="mb-3 upload-box">
+                        <label class="text-white-50 small">ДОКУМЕНТЫ (PDF/ZIP)</label>
+                        {{ reg_form.documents(class="form-control mt-2", style="background: #000; color: white; border: 1px solid #444;") }}
+                        <small class="text-white-50">Право на распространение, подтверждение группы</small>
+                    </div>
+                </div>
+                
+                <!-- Поле для разработчика -->
+                <div id="admin-fields" style="display: none;">
+                    <div class="mb-3">
+                        {{ reg_form.admin_key(class="input", placeholder="СЕКРЕТНЫЙ КЛЮЧ РАЗРАБОТЧИКА") }}
+                    </div>
+                </div>
+                
+                {% if error and active_tab == 'register' %}
+                <div class="alert alert-danger">{{ error }}</div>
+                {% endif %}
+                
+                <button type="submit" name="submit_register" class="btn-reg mt-3">
+                    {{ reg_form.submit.label.text }}
+                </button>
+            </form>
+        </div>
     </div>
 </div>
 
 <script>
-function switchAuth(type) {
-    const btns = document.querySelectorAll('.role-tabs .role-btn');
-    btns[0].classList.toggle('active', type === 'login');
-    btns[1].classList.toggle('active', type === 'register');
-    
-    document.getElementById('loginForm').style.display = type === 'login' ? 'block' : 'none';
-    document.getElementById('registerForm').style.display = type === 'register' ? 'block' : 'none';
+function switchTab(tab) {
+    if (tab === 'login') {
+        document.getElementById('login-tab').style.display = 'block';
+        document.getElementById('register-tab').style.display = 'none';
+        document.querySelectorAll('.role-btn')[0].classList.add('active');
+        document.querySelectorAll('.role-btn')[1].classList.remove('active');
+    } else {
+        document.getElementById('login-tab').style.display = 'none';
+        document.getElementById('register-tab').style.display = 'block';
+        document.querySelectorAll('.role-btn')[0].classList.remove('active');
+        document.querySelectorAll('.role-btn')[1].classList.add('active');
+    }
 }
 
-function toggleDocs(show) {
-    document.getElementById('bandDocs').style.display = show ? 'block' : 'none';
+function toggleBandFields() {
+    const role = document.querySelector('input[name="role"]:checked').value;
+    document.getElementById('band-fields').style.display = role === 'band' ? 'block' : 'none';
+    document.getElementById('admin-fields').style.display = role === 'admin' ? 'block' : 'none';
 }
 </script>
 {% endblock %}
