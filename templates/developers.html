@@ -2,22 +2,22 @@
 
 {% block content %}
 <div class="container">
-    <h2 class="gradient-title mb-4">ПАНЕЛЬ РАЗРАБОТЧИКА</h2>
+    <h2 class="page-title mb-4 text-center">{{ txt.admin_panel }}</h2>
     
     <!-- Заявки на проверку -->
     <div class="custom-card mb-4">
-        <h3 class="text-warning">📋 Заявки на проверку ({{ pending_bands|length }})</h3>
+        <h3 class="text-warning text-center">📋 {{ txt.pending_apps }} ({{ pending_bands|length }})</h3>
         {% if pending_bands %}
             <div class="table-responsive">
                 <table class="table table-dark">
                     <thead>
                         <tr>
-                            <th>Группа</th>
-                            <th>Логин</th>
-                            <th>ИНН</th>
-                            <th>РКН</th>
-                            <th>Документы</th>
-                            <th>Действия</th>
+                            <th>{{ txt.band }}</th>
+                            <th>{{ txt.login_col }}</th>
+                            <th>{{ txt.inn }}</th>
+                            <th>{{ txt.rkn }}</th>
+                            <th>{{ txt.docs }}</th>
+                            <th>{{ txt.actions }}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -29,10 +29,8 @@
                             <td>{{ band.rkn_number or '-' }}</td>
                             <td>
                                 {% if band.docs_path %}
-                                <a href="{{ band.docs_path }}" class="btn btn-sm btn-info" download>📄 Скачать</a>
-                                {% else %}
-                                -
-                                {% endif %}
+                                <a href="{{ band.docs_path }}" class="btn btn-sm btn-info" download>📄</a>
+                                {% else %}-{% endif %}
                             </td>
                             <td>
                                 <a href="{{ url_for('approve_band', band_id=band.id) }}" class="btn btn-sm btn-success">✓</a>
@@ -44,21 +42,21 @@
                 </table>
             </div>
         {% else %}
-            <p class="text-white-50">Нет новых заявок</p>
+            <p class="text-white-50 text-center">{{ txt.no_pending }}</p>
         {% endif %}
     </div>
     
     <!-- Подтверждённые группы -->
     <div class="custom-card">
-        <h3 class="text-success">✅ Подтверждённые группы ({{ approved_bands|length }})</h3>
+        <h3 class="text-success text-center">✅ {{ txt.approved_bands }} ({{ approved_bands|length }})</h3>
         {% if approved_bands %}
             <div class="table-responsive">
                 <table class="table table-dark">
                     <thead>
                         <tr>
-                            <th>Группа</th>
-                            <th>Логин</th>
-                            <th>Дата регистрации</th>
+                            <th>{{ txt.band }}</th>
+                            <th>{{ txt.login_col }}</th>
+                            <th>{{ txt.date }}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -73,11 +71,11 @@
                 </table>
             </div>
         {% else %}
-            <p class="text-white-50">Нет подтверждённых групп</p>
+            <p class="text-white-50 text-center">{{ txt.no_approved }}</p>
         {% endif %}
     </div>
     
-    <div class="mt-4">
+    <div class="mt-4 text-center">
         <a href="{{ url_for('index') }}" class="btn-back">{{ txt.back }}</a>
     </div>
 </div>

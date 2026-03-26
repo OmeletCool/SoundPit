@@ -10,30 +10,65 @@ body {
 }
 
 @keyframes gradientBG {
-    0% {
-        background-position: 0% 50%
-    }
+    0% { background-position: 0% 50% }
+    50% { background-position: 100% 50% }
+    100% { background-position: 0% 50% }
+}
 
-    50% {
-        background-position: 100% 50%
-    }
-
-    100% {
-        background-position: 0% 50%
-    }
+/* Навигация */
+.navbar {
+    background: rgba(0, 0, 0, 0.3) !important;
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(157, 78, 221, 0.2);
+    padding: 15px 0;
+    position: relative;
+    z-index: 1000;
 }
 
 .navbar-brand {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 3rem;
+    font-size: 2.5rem;
     font-weight: 900;
     color: #9d4edd;
     text-shadow: 0 0 20px rgba(157, 78, 221, 0.6);
+    text-decoration: none;
+    white-space: nowrap;
+    z-index: 1001;
 }
 
-/* ввод */
+.navbar-brand:hover {
+    color: #c77dff;
+}
+
+/* 🔥 Уменьшенные заголовки (Панель админа, Профиль) */
+.page-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #9d4edd;
+    text-shadow: 0 0 10px rgba(157, 78, 221, 0.4);
+}
+
+.admin-link, .profile-link {
+    font-size: 0.9rem;
+}
+
+/* Dropdown меню */
+.dropdown-menu {
+    z-index: 1002;
+    background: #1a1a1a;
+    border: 1px solid rgba(157, 78, 221, 0.3);
+}
+
+.dropdown-item {
+    color: #e0d7f2;
+}
+
+.dropdown-item:hover {
+    background: rgba(157, 78, 221, 0.2);
+    color: #9d4edd;
+}
+
+/* Ввод */
 .input {
     background-color: #1a1a1a;
     width: 100%;
@@ -57,62 +92,110 @@ body {
     color: transparent;
 }
 
-/* переливающийся обод */
-.gradient-button {
+/* 🔥 Контейнер поиска */
+.search-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    max-width: 550px;
+    margin: 0 auto;
     position: relative;
-    padding: 16px 32px;
-    font-size: 18px;
-    font-weight: bold;
-    color: white;
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    border-radius: 50px;
-    overflow: hidden;
-    transition: transform 0.2s ease;
+}
+
+.search-container .input {
     width: 100%;
 }
 
-.gradient-button::before {
+/* 🔥 Подсказки */
+.suggestions-box {
+    position: absolute;
+    top: 55px;
+    left: 0;
+    right: 0;
+    background: #1a1a1a;
+    border: 1px solid rgba(157, 78, 221, 0.3);
+    border-radius: 8px;
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 1003;
+    display: none;
+}
+
+.suggestions-box:has(.suggestion-item) {
+    display: block;
+}
+
+.suggestion-item {
+    padding: 10px 15px;
+    cursor: pointer;
+    transition: 0.2s;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.suggestion-item:hover {
+    background: rgba(157, 78, 221, 0.2);
+    color: #9d4edd;
+}
+
+.suggestion-item:last-child {
+    border-bottom: none;
+}
+
+/* Кнопка поиска */
+.btn-search {
+    --border-color: linear-gradient(-45deg, #ffae00, #7e03aa, #00fffb);
+    --border-width: 0.125em;
+    --curve-size: 0.5em;
+    --bg: #080312;
+    --color: #afffff;
+    color: var(--color);
+    cursor: pointer;
+    position: relative;
+    isolation: isolate;
+    display: inline-grid;
+    place-content: center;
+    padding: 0.8em 3em;
+    font-size: 17px;
+    border: 0;
+    text-transform: uppercase;
+    clip-path: polygon(0% var(--curve-size), var(--curve-size) 0, 100% 0, 100% calc(100% - var(--curve-size)), calc(100% - var(--curve-size)) 100%, 0 100%);
+    transition: color 250ms;
+    white-space: nowrap;
+}
+
+.btn-search::before {
+    background: var(--border-color);
+    background-size: 300% 300%;
+    animation: move-bg 5s ease infinite;
     content: "";
     position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: conic-gradient(from 0deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4, #feca57, #ff9ff3, #ff6b6b);
+    inset: 0;
     z-index: -2;
-    filter: blur(10px);
-    animation: rotate 3s linear infinite;
 }
 
-@keyframes rotate {
-    from {
-        transform: rotate(0deg)
-    }
-
-    to {
-        transform: rotate(360deg)
-    }
+@keyframes move-bg {
+    0% { background-position: 31% 0% }
+    50% { background-position: 70% 100% }
+    100% { background-position: 31% 0% }
 }
 
-.gradient-button::after {
+.btn-search::after {
+    background: var(--bg);
     content: "";
     position: absolute;
-    inset: 3px;
-    background: #000;
-    border-radius: 47px;
+    inset: 0;
     z-index: -1;
+    clip-path: polygon(var(--border-width) calc(var(--curve-size) + var(--border-width) * 0.5), calc(var(--curve-size) + var(--border-width) * 0.5) var(--border-width), calc(100% - var(--border-width)) var(--border-width), calc(100% - var(--border-width)) calc(100% - calc(var(--curve-size) + var(--border-width) * 0.5)), calc(100% - calc(var(--curve-size) + var(--border-width) * 0.5)) calc(100% - var(--border-width)), var(--border-width) calc(100% - var(--border-width)));
+    transition: clip-path 500ms;
 }
 
-.gradient-text {
-    color: transparent;
-    background: conic-gradient(from 0deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4, #feca57, #ff9ff3, #ff6b6b);
-    -webkit-background-clip: text;
-    background-clip: text;
+.btn-search:hover::after {
+    clip-path: polygon(calc(100% - var(--border-width)) calc(100% - calc(var(--curve-size) + var(--border-width) * 0.5)), calc(100% - var(--border-width)) var(--border-width), calc(100% - var(--border-width)) var(--border-width), calc(100% - var(--border-width)) calc(100% - calc(var(--curve-size) + var(--border-width) * 0.5)), calc(100% - calc(var(--curve-size) + var(--border-width) * 0.5)) calc(100% - var(--border-width)), calc(100% - calc(var(--curve-size) + var(--border-width) * 0.5)) calc(100% - var(--border-width)));
 }
 
-/* кнопка регистрации */
+/* Кнопка регистрации */
 .btn-reg {
     --border-color: linear-gradient(-45deg, #ffae00, #7e03aa, #00fffb);
     --border-width: 0.125em;
@@ -129,7 +212,6 @@ body {
     font-size: 17px;
     border: 0;
     text-transform: uppercase;
-    width: 100%;
     clip-path: polygon(0% var(--curve-size), var(--curve-size) 0, 100% 0, 100% calc(100% - var(--curve-size)), calc(100% - var(--curve-size)) 100%, 0 100%);
     transition: color 250ms;
 }
@@ -142,20 +224,6 @@ body {
     position: absolute;
     inset: 0;
     z-index: -2;
-}
-
-@keyframes move-bg {
-    0% {
-        background-position: 31% 0%
-    }
-
-    50% {
-        background-position: 70% 100%
-    }
-
-    100% {
-        background-position: 31% 0%
-    }
 }
 
 .btn-reg::after {
@@ -172,7 +240,7 @@ body {
     clip-path: polygon(calc(100% - var(--border-width)) calc(100% - calc(var(--curve-size) + var(--border-width) * 0.5)), calc(100% - var(--border-width)) var(--border-width), calc(100% - var(--border-width)) var(--border-width), calc(100% - var(--border-width)) calc(100% - calc(var(--curve-size) + var(--border-width) * 0.5)), calc(100% - calc(var(--curve-size) + var(--border-width) * 0.5)) calc(100% - var(--border-width)), calc(100% - calc(var(--curve-size) + var(--border-width) * 0.5)) calc(100% - var(--border-width)));
 }
 
-/* отпрыски */
+/* Карточки */
 .custom-card {
     background: rgba(255, 255, 255, 0.03);
     backdrop-filter: blur(15px);
@@ -181,33 +249,17 @@ body {
     padding: 40px;
 }
 
-.btn-back {
-    position: fixed;
-    bottom: 30px;
-    left: 30px;
-    background: rgba(255, 255, 255, 0.05);
-    color: white;
-    padding: 8px 20px;
-    border-radius: 12px;
-    text-decoration: none;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    transition: 0.3s;
-}
-
-.btn-back:hover {
-    background: #9d4edd;
-}
-
-.card-auth {
-    max-width: 550px;
+.card-home {
+    max-width: 600px;
     width: 100%;
 }
 
-.card-remix {
-    max-width: 850px;
-    padding: 40px;
+.card-auth {
+    max-width: 600px;
+    width: 100%;
 }
 
+/* Заголовок градиент */
 .gradient-title {
     font-size: 2.9rem;
     font-weight: 900;
@@ -221,64 +273,11 @@ body {
 }
 
 @keyframes rotate-text {
-    from {
-        filter: hue-rotate(0deg);
-    }
-
-    to {
-        filter: hue-rotate(360deg);
-    }
+    from { filter: hue-rotate(0deg); }
+    to { filter: hue-rotate(360deg); }
 }
 
-.drop-zone {
-    border: 3px dashed rgba(157, 78, 221, 0.3);
-    border-radius: 30px;
-    padding: 50px;
-    background: rgba(0, 0, 0, 0.3);
-    transition: 0.3s;
-}
-
-.auth-card {
-    background: #111;
-    border: 1px solid #333;
-    padding: 30px;
-    border-radius: 20px;
-    max-width: 400px;
-}
-
-.role-selector {
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-}
-
-.role-option input[type="radio"] {
-    accent-color: #9d4edd;
-    /* Фиолетовый неон */
-    transform: scale(1.2);
-}
-
-.auth-input {
-    width: 100%;
-    background: #000;
-    border: 1px solid #444;
-    color: white;
-    padding: 12px;
-    border-radius: 10px;
-}
-
-.btn-neon-wide {
-    width: 100%;
-    background: linear-gradient(45deg, #9d4edd, #5a189a);
-    border: none;
-    color: white;
-    padding: 12px;
-    border-radius: 10px;
-    font-weight: bold;
-    transition: 0.3s;
-}
-
-/* Новые стили для форм */
+/* Вкладки */
 .role-tabs {
     display: flex;
     justify-content: center;
@@ -289,7 +288,7 @@ body {
     background: none;
     border: none;
     color: rgba(255, 255, 255, 0.4);
-    padding: 10px 20px;
+    padding: 10px 30px;
     font-weight: bold;
     transition: 0.3s;
 }
@@ -299,9 +298,16 @@ body {
     border-bottom: 2px solid #9d4edd;
 }
 
+/* Выбор роли */
+.role-selector {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+}
+
 .role-radio {
     cursor: pointer;
-    font-size: 0.9rem;
+    font-size: 1rem;
     transition: 0.3s;
 }
 
@@ -309,6 +315,7 @@ body {
     color: #9d4edd;
 }
 
+/* Загрузка файлов */
 .upload-box {
     border: 1px dashed rgba(255, 255, 255, 0.2);
     padding: 15px;
@@ -316,10 +323,55 @@ body {
     background: rgba(0, 0, 0, 0.2);
 }
 
-/* Фикс для навигации */
-.user-name {
-    padding: 5px 15px;
-    background: rgba(157, 78, 221, 0.1);
-    border-radius: 20px;
-    border: 1px solid rgba(157, 78, 221, 0.3);
+/* Статус группы */
+.status-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 15px;
+    font-size: 0.7rem;
+    font-weight: bold;
+    margin-left: 8px;
+}
+
+.status-badge.pending {
+    background: rgba(255, 193, 7, 0.2);
+    color: #ffc107;
+    border: 1px solid #ffc107;
+}
+
+.status-badge.certified {
+    background: rgba(40, 167, 69, 0.2);
+    color: #28a745;
+    border: 1px solid #28a745;
+}
+
+/* Кнопка назад */
+.btn-back {
+    background: rgba(255, 255, 255, 0.05);
+    color: white;
+    padding: 8px 20px;
+    border-radius: 12px;
+    text-decoration: none;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: 0.3s;
+}
+
+.btn-back:hover {
+    background: #9d4edd;
+}
+
+/* Навигация - ссылки */
+.nav-link {
+    color: #e0d7f2 !important;
+    transition: 0.3s;
+}
+
+.nav-link:hover {
+    color: #9d4edd !important;
+}
+
+/* Центрирование кнопок в форме */
+.d-grid {
+    display: grid;
+    place-items: center;
 }

@@ -1,18 +1,58 @@
 {% extends 'base.html' %}
+
 {% block content %}
-<div class="w-100 text-center">
-    <div class="custom-card mx-auto shadow-lg" style="max-width: 650px;">
-        <form>
-            <div class="mb-4">
-                <input placeholder="{{ txt.search_place }}" class="input" type="text">
+<div class="container d-flex justify-content-center" style="min-height: 60vh;">
+    <div class="custom-card card-home text-center" style="max-width: 600px; width: 100%; padding: 30px;">
+        
+        <!-- 🔥 Поиск виден всем -->
+        <form action="{{ url_for('search') }}" method="GET" class="search-form mt-3">
+            <div class="search-container">
+                <input type="text" name="q" id="search-input" class="input" placeholder="{{ txt.search_place }}" value="{{ request.args.get('q', '') }}" autocomplete="off">
+                <div id="search-suggestions" class="suggestions-box"></div>
+                <button type="submit" class="btn-search mt-2">{{ txt.send }}</button>
             </div>
-            <button type="submit" class="gradient-button">
-                <span class="gradient-text">{{ txt.send }}</span>
-            </button>
         </form>
-    </div>
-    <div class="mt-4">
-        <a href="/remix" class="text-decoration-none fw-bold" style="color: #9d4edd; letter-spacing: 1px;">{{ txt.remix_title }}</a>
+        
+        {% if not session.get('user_id') %}
+        <p class="text-white-50 mt-3 small">Для поиска войдите или зарегистрируйтесь</p>
+        {% endif %}
     </div>
 </div>
+
+<script>
+// Автодополнение для поиска групп
+document.getElementById('search-input')?.addEventListener('input', function() {
+    const query = this.value.trim();
+    const suggestionsBox = document.getElementById('search-suggestions');
+    
+    if (query.length < 2) {
+        suggestionsBox.innerHTML = '';
+        return;
+    }
+    
+    fetch('/api/suggest?q=' + encodeURIComponent(query))
+        .then(response => response.json())
+        .then(data => {
+            if (data.suggestions.length > 0) {
+                suggestionsBox.innerHTML = data.suggestions.map(band => 
+                    `<div class="suggestion-item" onclick="selectBand('${band.name}')">${band.name}</div>`
+                ).join('');
+            } else {
+                suggestionsBox.innerHTML = '';
+            }
+        })
+        .catch(err => console.error(err));
+});
+
+function selectBand(name) {
+    document.getElementById('search-input').value = name;
+    document.getElementById('search-suggestions').innerHTML = '';
+}
+
+document.addEventListener('click', function(e) {
+    if (!e.target.closest('.search-container')) {
+        document.getElementById('search-suggestions').innerHTML = '';
+    }
+});
+</script>
 {% endblock %}

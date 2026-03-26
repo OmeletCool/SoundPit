@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container d-flex justify-content-center" style="min-height: 70vh;">
+    <div class="custom-card card-home" style="max-width: 600px; width: 100%;">
+        <h2 class="page-title text-center mb-4">{{ txt.profile }}</h2>
+        
+        <div class="table-responsive">
+            <table class="table table-dark">
+                <tr>
+                    <th>{{ txt.username }}:</th>
+                    <td>{{ user.username }}</td>
+                </tr>
+                <tr>
+                    <th>{{ txt.name }}:</th>
+                    <td>{{ user.name }}</td>
+                </tr>
+                <tr>
+                    <th>{{ txt.email }}:</th>
+                    <td>{{ user.email }}</td>
+                </tr>
+                <tr>
+                    <th>{{ txt.role }}:</th>
+                    <td>
+                        {% if user.role == 'user' %}{{ txt.listener }}
+                        {% elif user.role == 'band' %}{{ txt.band }}
+                        {% else %}{{ txt.admin }}{% endif %}
+                    </td>
+                </tr>
+                {% if user.role == 'band' %}
+                <tr>
+                    <th>{{ txt.status }}:</th>
+                    <td>
+                        {% if user.status == 'pending' %}
+                        <span class="status-badge pending">⏳ {{ txt.pending }}</span>
+                        {% else %}
+                        <span class="status-badge certified">✓ {{ txt.certified }}</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <th>{{ txt.inn }}:</th>
+                    <td>{{ user.inn or '-' }}</td>
+                </tr>
+                <tr>
+                    <th>{{ txt.rkn }}:</th>
+                    <td>{{ user.rkn_number or '-' }}</td>
+                </tr>
+                {% endif %}
+                <tr>
+                    <th>{{ txt.funds }}:</th>
+                    <td>{{ user.funds }} {% if current_lang == 'sq' %}{{ txt.all }}{% else %}{{ txt.rub }}{% endif %} 
+                        <small class="text-white-50">(пополнение скоро)</small>
+                    </td>
+                </tr>
+                <tr>
+                    <th>{{ txt.created }}:</th>
+                    <td>{{ user.created_date.strftime('%d.%m.%Y %H:%M') if user.created_date else '-' }}</td>
+                </tr>
+            </table>
+        </div>
+        
+        <div class="text-center mt-4">
+            <a href="{{ url_for('index') }}" class="btn-back">{{ txt.back }}</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

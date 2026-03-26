@@ -9,56 +9,46 @@
     <link rel="icon" href="{{ url_for('static', filename='images/favicon.ico') }}">
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-transparent">
-        <div class="container">
-            <a class="navbar-brand" href="{{ url_for('index') }}">SOUNDHOLE</a>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container-fluid">
+            <!-- SOUNDHOLE по центру -->
+            <a class="navbar-brand mx-auto position-absolute start-50 translate-middle-x" href="{{ url_for('index') }}">SOUNDHOLE</a>
             
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto align-items-center">
-                    <!-- Языки -->
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
-                            {{ session.get('lang', 'ru')|upper }}
-                        </a>
-                        <ul class="dropdown-menu">
-                            {% for l in ['ru', 'en', 'sq'] %}
-                            <li><a class="dropdown-item" href="{{ url_for('set_lang', lang=l) }}">{{ l|upper }}</a></li>
-                            {% endfor %}
-                        </ul>
-                    </li>
-                    
-                    <!-- Разработчики -->
-                    {% if session.get('role') == 'admin' %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('developers') }}">{{ txt.admin_panel }}</a>
-                    </li>
+            <!-- Языки + Аккаунт справа от центра -->
+            <div class="d-flex ms-auto">
+                <!-- Язык -->
+                <div class="dropdown me-3">
+                    <button class="btn btn-outline-light btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                        {{ current_lang|upper }}
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        {% for l in ['ru', 'en', 'sq'] %}
+                        <li><a class="dropdown-item" href="{{ url_for('set_lang', lang=l) }}">{{ l|upper }}</a></li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                
+                <!-- Админка -->
+                {% if session.get('role') == 'admin' %}
+                <a class="nav-link me-3 admin-link" href="{{ url_for('developers') }}">{{ txt.admin_panel }}</a>
+                {% endif %}
+                
+                <!-- Аккаунт / Вход -->
+                {% if session.get('user_id') %}
+                <a class="nav-link me-3 profile-link" href="{{ url_for('account') }}">
+                    {{ session['display_name'] }}
+                    {% if session.get('role') == 'band' %}
+                        {% if session.get('status') == 'pending' %}
+                        <span class="status-badge pending">⏳ {{ txt.pending }}</span>
+                        {% else %}
+                        <span class="status-badge certified">✓ {{ txt.certified }}</span>
+                        {% endif %}
                     {% endif %}
-                    
-                    <!-- Авторизация -->
-                    {% if session.get('user_id') %}
-                    <li class="nav-item">
-                        <span class="user-name me-3">
-                            {{ session['display_name'] }}
-                            {% if session.get('role') == 'band' %}
-                                <small class="text-warning">
-                                    {% if session.get('status') == 'pending' %}({{ txt.pending }}){% endif %}
-                                </small>
-                            {% endif %}
-                        </span>
-                    </li>
-                    <li class="nav-item">
-                        <a class="btn btn-outline-light btn-sm" href="{{ url_for('logout') }}">✕ ВЫЙТИ</a>
-                    </li>
-                    {% else %}
-                    <li class="nav-item">
-                        <a class="btn btn-outline-light btn-sm" href="{{ url_for('login') }}">{{ txt.login }}</a>
-                    </li>
-                    {% endif %}
-                </ul>
+                </a>
+                <a class="btn btn-outline-light btn-sm" href="{{ url_for('logout') }}">✕</a>
+                {% else %}
+                <a class="btn btn-outline-light btn-sm" href="{{ url_for('login') }}">{{ txt.login }}</a>
+                {% endif %}
             </div>
         </div>
     </nav>
