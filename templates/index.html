@@ -1,58 +1,44 @@
 {% extends 'base.html' %}
-
 {% block content %}
-<div class="container d-flex justify-content-center" style="min-height: 60vh;">
-    <div class="custom-card card-home text-center" style="max-width: 600px; width: 100%; padding: 30px;">
+<div class="container d-flex justify-content-center" style="min-height: 70vh;">
+    <div class="custom-card card-home text-center">
         
-        <!-- 🔥 Поиск виден всем -->
-        <form action="{{ url_for('search') }}" method="GET" class="search-form mt-3">
-            <div class="search-container">
-                <input type="text" name="q" id="search-input" class="input" placeholder="{{ txt.search_place }}" value="{{ request.args.get('q', '') }}" autocomplete="off">
-                <div id="search-suggestions" class="suggestions-box"></div>
-                <button type="submit" class="btn-search mt-2">{{ txt.send }}</button>
+        <div class="search-wrapper d-flex align-items-center justify-content-center gap-3 mb-4">
+            {% if session.get('user_id') and session.get('role') == 'band' %}
+            <div class="page-action-btn">
+                <button class="btn-pencil" id="pencil-btn">✏️</button>
+                <div class="page-menu" id="page-menu">
+                    {% if show_pending %}
+                    <div class="menu-item disabled">
+                        ⚠️ {{ txt.pending_message }}
+                    </div>
+                    {% elif band_page %}
+                    <div class="menu-item">
+                        <a href="/band_page/{{ band_page.id }}/edit">{{ txt.edit_page }}</a>
+                    </div>
+                    <div class="menu-item">
+                        <a href="/band_page/{{ band_page.id }}" target="_blank">{{ txt.my_page }}</a>
+                    </div>
+                    {% else %}
+                    <div class="menu-item">
+                        <a href="/band_page/create">➕ {{ txt.create_page }}</a>
+                    </div>
+                    {% endif %}
+                </div>
             </div>
-        </form>
+            {% endif %}
+            
+            <form action="{{ url_for('search') }}" method="GET" class="search-form flex-grow-1">
+                <input type="text" name="q" class="input" placeholder="{{ txt.search_place }}">
+                <button type="submit" class="btn-reg mt-2">{{ txt.send }}</button>
+            </form>
+        </div>
         
         {% if not session.get('user_id') %}
-        <p class="text-white-50 mt-3 small">Для поиска войдите или зарегистрируйтесь</p>
+        <p class="text-white-50 mt-3">{{ txt.platform_desc }}</p>
         {% endif %}
     </div>
 </div>
 
-<script>
-// Автодополнение для поиска групп
-document.getElementById('search-input')?.addEventListener('input', function() {
-    const query = this.value.trim();
-    const suggestionsBox = document.getElementById('search-suggestions');
-    
-    if (query.length < 2) {
-        suggestionsBox.innerHTML = '';
-        return;
-    }
-    
-    fetch('/api/suggest?q=' + encodeURIComponent(query))
-        .then(response => response.json())
-        .then(data => {
-            if (data.suggestions.length > 0) {
-                suggestionsBox.innerHTML = data.suggestions.map(band => 
-                    `<div class="suggestion-item" onclick="selectBand('${band.name}')">${band.name}</div>`
-                ).join('');
-            } else {
-                suggestionsBox.innerHTML = '';
-            }
-        })
-        .catch(err => console.error(err));
-});
-
-function selectBand(name) {
-    document.getElementById('search-input').value = name;
-    document.getElementById('search-suggestions').innerHTML = '';
-}
-
-document.addEventListener('click', function(e) {
-    if (!e.target.closest('.search-container')) {
-        document.getElementById('search-suggestions').innerHTML = '';
-    }
-});
-</script>
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
 {% endblock %}

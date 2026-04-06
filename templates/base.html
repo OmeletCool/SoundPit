@@ -11,12 +11,9 @@
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark">
         <div class="container-fluid">
-            <!-- SOUNDHOLE по центру -->
             <a class="navbar-brand mx-auto position-absolute start-50 translate-middle-x" href="{{ url_for('index') }}">SOUNDHOLE</a>
             
-            <!-- Языки + Аккаунт справа от центра -->
             <div class="d-flex ms-auto">
-                <!-- Язык -->
                 <div class="dropdown me-3">
                     <button class="btn btn-outline-light btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
                         {{ current_lang|upper }}
@@ -28,14 +25,12 @@
                     </ul>
                 </div>
                 
-                <!-- Админка -->
                 {% if session.get('role') == 'admin' %}
-                <a class="nav-link me-3 admin-link" href="{{ url_for('developers') }}">{{ txt.admin_panel }}</a>
+                <a class="nav-link me-3" href="{{ url_for('developers') }}">{{ txt.admin_panel }}</a>
                 {% endif %}
                 
-                <!-- Аккаунт / Вход -->
                 {% if session.get('user_id') %}
-                <a class="nav-link me-3 profile-link" href="{{ url_for('account') }}">
+                <a class="nav-link me-3" href="{{ url_for('account') }}">
                     {{ session['display_name'] }}
                     {% if session.get('role') == 'band' %}
                         {% if session.get('status') == 'pending' %}
@@ -45,7 +40,7 @@
                         {% endif %}
                     {% endif %}
                 </a>
-                <a class="btn btn-outline-light btn-sm" href="{{ url_for('logout') }}">✕</a>
+                <a class="btn btn-outline-light btn-sm" href="{{ url_for('logout') }}">✕ {{ txt.logout }}</a>
                 {% else %}
                 <a class="btn btn-outline-light btn-sm" href="{{ url_for('login') }}">{{ txt.login }}</a>
                 {% endif %}

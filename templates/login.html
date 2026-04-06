@@ -1,28 +1,30 @@
 {% extends 'base.html' %}
-
 {% block content %}
-<div class="container d-flex justify-content-center align-items-center" style="min-height: 80vh;">
+<div class="container d-flex flex-column justify-content-center align-items-center" style="min-height: 80vh;">
+    {% if warning_message %}
+    <div class="warning-banner mb-4" id="warning-banner">
+        ⚠️ {{ warning_message }}
+    </div>
+    {% endif %}
+    {% if error %}
+    <div class="error-banner mb-4">
+        ⚠️ {{ error }}
+    </div>
+    {% endif %}
     <div class="custom-card card-auth">
-        
-        <!-- Вкладки -->
         <div class="role-tabs mb-4">
-            <button class="role-btn active" onclick="switchTab('login')">{{ txt.login }}</button>
-            <button class="role-btn" onclick="switchTab('register')">{{ txt.reg }}</button>
+            <button class="role-btn {{ 'active' if active_tab == 'login' else '' }}" onclick="switchTab('login')">{{ txt.login }}</button>
+            <button class="role-btn {{ 'active' if active_tab == 'register' else '' }}" onclick="switchTab('register')">{{ txt.reg }}</button>
         </div>
-        
-        <!-- Форма входа -->
-        <div id="login-tab">
-            <form method="POST" class="auth-form">
+        <div id="login-tab" style="{{ 'display: block;' if active_tab == 'login' else 'display: none;' }}">
+            <form method="POST" class="auth-form" id="login-form">
                 {{ login_form.hidden_tag() }}
                 <div class="mb-3">
-                    {{ login_form.username(class="input", placeholder=txt.login) }}
+                    {{ login_form.username(class="input", placeholder=txt.login, id="login-username") }}
                 </div>
                 <div class="mb-3">
-                    {{ login_form.password(class="input", placeholder=txt.password) }}
+                    {{ login_form.password(class="input", placeholder=txt.password, id="login-password") }}
                 </div>
-                {% if error and active_tab == 'login' %}
-                <div class="alert alert-danger">{{ error }}</div>
-                {% endif %}
                 <div class="d-grid">
                     <button type="submit" name="submit_login" class="btn-reg mt-3">
                         {{ txt.submit_login }}
@@ -30,17 +32,9 @@
                 </div>
             </form>
         </div>
-        
-        <!-- Форма регистрации -->
-        <div id="register-tab" style="display: none;">
-            <form method="POST" enctype="multipart/form-data" class="auth-form">
+        <div id="register-tab" style="{{ 'display: block;' if active_tab == 'register' else 'display: none;' }}">
+            <form method="POST" enctype="multipart/form-data" class="auth-form" id="register-form">
                 {{ reg_form.hidden_tag() }}
-                
-                {% if error and active_tab == 'register' %}
-                <div class="alert alert-danger mb-3">{{ error }}</div>
-                {% endif %}
-                
-                <!-- Выбор роли -->
                 <div class="mb-4">
                     <label class="text-white-50 small d-block text-center mb-2">
                         {{ txt.account_type }}
@@ -56,49 +50,63 @@
                         </label>
                     </div>
                 </div>
-                
-                <!-- Основные поля -->
                 <div class="mb-3">
                     {{ reg_form.username(class="input", id="username-field", placeholder=txt.create_login) }}
+                    <small class="text-danger" id="username-error" style="display: none;"></small>
                 </div>
                 <div class="mb-3">
                     {{ reg_form.name(class="input", id="name-field", placeholder=txt.your_name) }}
                 </div>
-                <div class="mb-3">
-                    {{ reg_form.email(class="input", placeholder=txt.email) }}
+                <div class="mb-3" id="email-field">
+                    {{ reg_form.email(class="input", placeholder=txt.email, id="reg-email") }}
+                    <small class="text-danger" id="email-error" style="display: none;"></small>
                 </div>
                 <div class="mb-3">
-                    {{ reg_form.password(class="input", placeholder=txt.password) }}
+                    {{ reg_form.password(class="input", id="reg-password", placeholder=txt.password) }}
+                    <small class="text-danger" id="password-requirements" style="display: none;"></small>
                 </div>
                 <div class="mb-3">
-                    {{ reg_form.password_again(class="input", placeholder=txt.repeat_password) }}
+                    {{ reg_form.password_again(class="input", id="reg-password-again", placeholder=txt.repeat_password) }}
+                    <small class="text-danger" id="password-error" style="display: none;">{{ txt.passwords_mismatch }}</small>
                 </div>
                 <div class="mb-3">
                     {{ reg_form.about(class="input", id="about-field", placeholder=txt.about, rows="3") }}
                 </div>
-                
-                <!-- Поля для групп -->
                 <div id="band-fields" style="display: none;">
                     <hr class="border-secondary my-4">
                     <h5 class="text-warning text-center mb-3">📋 {{ txt.documents }}</h5>
                     <div class="mb-3">
-                        {{ reg_form.inn(class="input", placeholder=txt.inn) }}
+                        <input type="text" name="inn" class="input" placeholder="{{ txt.inn }}">
                     </div>
                     <div class="mb-3">
-                        {{ reg_form.rkn_number(class="input", placeholder=txt.rkn) }}
+                        <input type="text" name="rkn_number" class="input" placeholder="{{ txt.rkn }}">
                     </div>
                     <div class="mb-3">
-                        {{ reg_form.band_email(class="input", placeholder=txt.rep_email) }}
+                        <input type="text" name="ogrn" class="input" placeholder="{{ txt.ogrn }}">
+                    </div>
+                    <div class="mb-3">
+                        <input type="text" name="kpp" class="input" placeholder="{{ txt.kpp }}">
+                    </div>
+                    <div class="mb-3">
+                        <input type="text" name="rep_name" class="input" placeholder="{{ txt.rep_name }}">
+                    </div>
+                    <div class="mb-3">
+                        <input type="email" name="rep_email" class="input" placeholder="{{ txt.rep_email }}">
+                    </div>
+                    <div class="mb-3">
+                        <input type="tel" name="rep_phone" class="input" placeholder="{{ txt.rep_phone }}">
+                    </div>
+                    <div class="mb-3">
+                        <input type="text" name="legal_address" class="input" placeholder="{{ txt.legal_address }}">
                     </div>
                     <div class="mb-3 upload-box">
                         <label class="text-white-50 small d-block mb-2">{{ txt.documents }}</label>
-                        {{ reg_form.documents(class="form-control", style="background: #000; color: white; border: 1px solid #444;") }}
+                        <input type="file" name="documents" class="form-control" style="background: #000; color: white; border: 1px solid #444;" accept=".pdf,.zip,.doc,.docx">
                         <small class="text-white-50 d-block mt-1">{{ txt.docs_hint }}</small>
                     </div>
                 </div>
-                
                 <div class="d-grid">
-                    <button type="submit" name="submit_register" class="btn-reg mt-3">
+                    <button type="submit" name="submit_register" class="btn-reg mt-3" id="submit-register">
                         {{ txt.create_account }}
                     </button>
                 </div>
@@ -106,7 +114,6 @@
         </div>
     </div>
 </div>
-
 <script>
 function switchTab(tab) {
     if (tab === 'login') {
@@ -121,24 +128,119 @@ function switchTab(tab) {
         document.querySelectorAll('.role-btn')[1].classList.add('active');
     }
 }
-
 function toggleFields() {
     const role = document.querySelector('input[name="role"]:checked').value;
     const bandFields = document.getElementById('band-fields');
+    const emailField = document.getElementById('email-field');
     const nameField = document.getElementById('name-field');
     const aboutField = document.getElementById('about-field');
-    
     if (role === 'band') {
         bandFields.style.display = 'block';
+        emailField.style.display = 'none';
         nameField.placeholder = "{{ txt.band_name }}";
         aboutField.placeholder = "{{ txt.about_band }}";
     } else {
         bandFields.style.display = 'none';
+        emailField.style.display = 'block';
         nameField.placeholder = "{{ txt.your_name }}";
         aboutField.placeholder = "{{ txt.about }}";
     }
 }
-
+const emailInput = document.getElementById('reg-email');
+const emailError = document.getElementById('email-error');
+const passwordInput = document.getElementById('reg-password');
+const passwordAgainInput = document.getElementById('reg-password-again');
+const passwordError = document.getElementById('password-error');
+const passwordRequirements = document.getElementById('password-requirements');
+const submitBtn = document.getElementById('submit-register');
+const warningBanner = document.getElementById('warning-banner');
+const loginInputs = document.querySelectorAll('#login-form input');
+loginInputs.forEach(input => {
+    input.addEventListener('input', function() {
+        if (warningBanner) {
+            warningBanner.style.display = 'none';
+        }
+    });
+});
+if (emailInput) {
+    emailInput.addEventListener('blur', function() {
+        const email = this.value.trim();
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (email && !emailRegex.test(email)) {
+            emailError.textContent = "{{ txt.invalid_email }}";
+            emailError.style.display = 'block';
+        } else {
+            emailError.style.display = 'none';
+        }
+    });
+    emailInput.addEventListener('input', function() {
+        emailError.style.display = 'none';
+    });
+}
+if (passwordInput) {
+    passwordInput.addEventListener('input', function() {
+        const password = this.value;
+        const minLength = 8;
+        const maxLength = 32;
+        const hasLetter = /[a-zA-Z]/.test(password);
+        const hasNumber = /[0-9]/.test(password);
+        const isValid = password.length >= minLength && password.length <= maxLength && hasLetter && hasNumber;
+        if (password.length > 0 && !isValid) {
+            passwordRequirements.textContent = "{{ txt.password_requirements }}";
+            passwordRequirements.style.display = 'block';
+        } else {
+            passwordRequirements.style.display = 'none';
+        }
+        checkPasswords();
+    });
+}
+if (passwordAgainInput) {
+    passwordAgainInput.addEventListener('input', checkPasswords);
+}
+function checkPasswords() {
+    const pass1 = passwordInput.value;
+    const pass2 = passwordAgainInput.value;
+    if (pass1 === '' && pass2 === '') {
+        passwordError.style.display = 'none';
+        return;
+    }
+    if (pass1 !== pass2) {
+        passwordError.style.display = 'block';
+    } else {
+        passwordError.style.display = 'none';
+    }
+}
+if (submitBtn) {
+    submitBtn.addEventListener('click', function(e) {
+        const pass1 = passwordInput.value;
+        const pass2 = passwordAgainInput.value;
+        const email = emailInput.value.trim();
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        const minLength = 8;
+        const maxLength = 32;
+        const hasLetter = /[a-zA-Z]/.test(pass1);
+        const hasNumber = /[0-9]/.test(pass1);
+        const isValidPassword = pass1.length >= minLength && pass1.length <= maxLength && hasLetter && hasNumber;
+        const role = document.querySelector('input[name="role"]:checked').value;
+        if (role === 'user' && email && !emailRegex.test(email)) {
+            e.preventDefault();
+            emailError.textContent = "{{ txt.invalid_email }}";
+            emailError.style.display = 'block';
+            return;
+        }
+        if (!isValidPassword) {
+            e.preventDefault();
+            passwordRequirements.textContent = "{{ txt.password_requirements }}";
+            passwordRequirements.style.display = 'block';
+            return;
+        }
+        if (pass1 !== pass2) {
+            e.preventDefault();
+            passwordError.style.display = 'block';
+            return;
+        }
+    });
+}
 document.addEventListener('DOMContentLoaded', function() {
     toggleFields();
 });

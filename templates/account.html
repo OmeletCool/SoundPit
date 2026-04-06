@@ -1,10 +1,8 @@
 {% extends 'base.html' %}
-
 {% block content %}
 <div class="container d-flex justify-content-center" style="min-height: 70vh;">
     <div class="custom-card card-home" style="max-width: 600px; width: 100%;">
         <h2 class="page-title text-center mb-4">{{ txt.profile }}</h2>
-        
         <div class="table-responsive">
             <table class="table table-dark">
                 <tr>
@@ -15,10 +13,12 @@
                     <th>{{ txt.name }}:</th>
                     <td>{{ user.name }}</td>
                 </tr>
+                {% if user.role == 'user' %}
                 <tr>
                     <th>{{ txt.email }}:</th>
                     <td>{{ user.email }}</td>
                 </tr>
+                {% endif %}
                 <tr>
                     <th>{{ txt.role }}:</th>
                     <td>
@@ -46,12 +46,18 @@
                     <th>{{ txt.rkn }}:</th>
                     <td>{{ user.rkn_number or '-' }}</td>
                 </tr>
+                <tr>
+                    <th>{{ txt.rep_name }}:</th>
+                    <td>{{ user.rep_name or '-' }}</td>
+                </tr>
+                <tr>
+                    <th>{{ txt.rep_email }}:</th>
+                    <td>{{ user.rep_email or '-' }}</td>
+                </tr>
                 {% endif %}
                 <tr>
                     <th>{{ txt.funds }}:</th>
-                    <td>{{ user.funds }} {% if current_lang == 'sq' %}{{ txt.all }}{% else %}{{ txt.rub }}{% endif %} 
-                        <small class="text-white-50">(пополнение скоро)</small>
-                    </td>
+                    <td>{{ user.funds }} {% if current_lang == 'sq' %}{{ txt.all }}{% else %}{{ txt.rub }}{% endif %}</td>
                 </tr>
                 <tr>
                     <th>{{ txt.created }}:</th>
@@ -59,7 +65,6 @@
                 </tr>
             </table>
         </div>
-        
         <div class="text-center mt-4">
             <a href="{{ url_for('index') }}" class="btn-back">{{ txt.back }}</a>
         </div>
