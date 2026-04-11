@@ -1,68 +1,74 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="{{ current_lang }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SOUNDHOLE | Premium Music CRM</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <link rel="icon" href="{{ url_for('static', filename='images/favicon.ico') }}">
+    <link rel="icon" href="{{ url_for('static', filename='images/favicon.ico') }}" type="image/x-icon">
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark">
-        <div class="container-fluid">
-            <a class="navbar-brand mx-auto position-absolute start-50 translate-middle-x" href="{{ url_for('index') }}">SOUNDHOLE</a>
-            
-            <div class="d-flex ms-auto">
-                <div class="dropdown me-3">
-                    <button class="btn btn-outline-light btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                        {{ current_lang|upper }}
-                    </button>
-                    <ul class="dropdown-menu dropdown-menu-end">
-                        {% for l in ['ru', 'en', 'sq'] %}
-                        <li><a class="dropdown-item" href="{{ url_for('set_lang', lang=l) }}">{{ l|upper }}</a></li>
-                        {% endfor %}
-                    </ul>
-                </div>
-                
-                {% if session.get('role') == 'admin' %}
-                <a class="nav-link me-3" href="{{ url_for('developers') }}">{{ txt.admin_panel }}</a>
-                {% endif %}
-                
-                {% if session.get('user_id') %}
-                <a class="nav-link me-3" href="{{ url_for('account') }}">
-                    {{ session['display_name'] }}
-                    {% if session.get('role') == 'band' %}
-                        {% if session.get('status') == 'pending' %}
-                        <span class="status-badge pending">⏳ {{ txt.pending }}</span>
-                        {% else %}
-                        <span class="status-badge certified">✓ {{ txt.certified }}</span>
-                        {% endif %}
+    <nav class="navbar navbar-expand-lg">
+        <div class="container-fluid navbar-container">
+            <div class="navbar-left">
+                <a class="navbar-brand" href="{{ url_for('index') }}">SOUNDHOLE</a>
+            </div>
+            <div class="navbar-right">
+                <div class="nav-items">
+                    <div class="lang-dropdown" style="position: relative; display: inline-block;">
+                        <button class="btn-lang dropdown-toggle" type="button" data-bs-toggle="dropdown" style="background: transparent; border: 1px solid rgba(255,255,255,0.3); color: #e0d7f2; padding: 5px 15px; border-radius: 8px;">
+                            {{ current_lang|upper }}
+                        </button>
+                        <ul class="dropdown-menu" style="position: absolute; top: 100%; right: 0; left: auto; min-width: 80px; margin-top: 5px; background: #1a1a1a; border: 1px solid rgba(157, 78, 221, 0.3);">
+                            {% for l in ['ru', 'en', 'sq'] %}
+                            <li>
+                                <a class="dropdown-item" href="{{ url_for('set_lang', lang=l) }}" style="color: #e0d7f2; padding: 8px 15px; display: block;">{{ l|upper }}</a>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    
+                    {% if session.get('role') == 'admin' %}
+                    <a class="nav-link admin-link" href="{{ url_for('developers') }}">{{ txt.admin_panel }}</a>
                     {% endif %}
-                </a>
-                <a class="btn btn-outline-light btn-sm" href="{{ url_for('logout') }}">✕ {{ txt.logout }}</a>
-                {% else %}
-                <a class="btn btn-outline-light btn-sm" href="{{ url_for('login') }}">{{ txt.login }}</a>
-                {% endif %}
+                    
+                    {% if session.get('user_id') %}
+                    <a class="nav-link profile-link" href="{{ url_for('account') }}">
+                        {{ session['display_name'] }}
+                        {% if session.get('role') == 'band' %}
+                            {% if session.get('status') == 'pending' %}
+                            <span class="status-badge pending">⏳ {{ txt.pending }}</span>
+                            {% else %}
+                            <span class="status-badge certified">✓ {{ txt.certified }}</span>
+                            {% endif %}
+                        {% endif %}
+                    </a>
+                    <a class="nav-link logout-link" href="{{ url_for('logout') }}">✕ {{ txt.logout }}</a>
+                    {% else %}
+                    <a class="nav-link login-link" href="{{ url_for('login') }}">{{ txt.login }}</a>
+                    {% endif %}
+                </div>
             </div>
         </div>
     </nav>
-    
-    <main class="container mt-4">
+
+    <div class="main-content">
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
-                {% for category, message in messages %}
-                <div class="alert alert-{{ 'danger' if category == 'warning' else category }} alert-dismissible fade show">
-                    {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                <div class="container mt-3">
+                    {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} text-center">
+                        {{ message }}
+                    </div>
+                    {% endfor %}
                 </div>
-                {% endfor %}
             {% endif %}
         {% endwith %}
         
         {% block content %}{% endblock %}
-    </main>
-    
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

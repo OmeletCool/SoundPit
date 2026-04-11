@@ -1,7 +1,8 @@
 import os
 import json
 import re
-import random
+import datetime
+import sqlalchemy
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 from werkzeug.utils import secure_filename
 from backend.database import db_session
@@ -12,10 +13,10 @@ from backend.forms.user_forms import LoginForm, RegisterForm
 
 app = Flask(__name__)
 app.secret_key = 'super_secret_neon_key_2026'
-
 UPLOAD_FOLDER = 'band_verifications'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+os.makedirs('static/images/band_covers', exist_ok=True)
 
 
 def load_translations():
@@ -36,7 +37,6 @@ def inject_vars():
 def index():
     band_page = None
     show_pending = False
-
     if 'user_id' in session and session.get('role') == 'band':
         db_sess = db_session.create_session()
         user = db_sess.query(UserModel).filter(
@@ -61,6 +61,33 @@ def set_lang(lang):
     if lang in TRANSLATIONS:
         session['lang'] = lang
     return redirect(request.referrer or url_for('index'))
+
+
+@app.route('/api/search_bands')
+def api_search_bands():
+    query = request.args.get('q', '').strip().lower()
+    db_sess = db_session.create_session()
+
+    if query:
+        bands = db_sess.query(UserModel).filter(
+            UserModel.role == 'band',
+            UserModel.status == 'active',
+            sqlalchemy.func.lower(UserModel.name).contains(query)
+        ).limit(10).all()
+    else:
+        bands = []
+
+    result = [
+        {
+            'id': band.id,
+            'name': band.name,
+            'username': band.username
+        }
+        for band in bands
+    ]
+
+    db_sess.close()
+    return json.dumps(result, ensure_ascii=False)
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -275,6 +302,122 @@ def search():
     return render_template('search.html', bands=bands, query=query)
 
 
+@app.route('/band_page/create', methods=['GET', 'POST'])
+def create_band_page():
+    if 'user_id' not in session or session.get('role') != 'band':
+        return redirect(url_for('login'))
+
+    if session.get('status') == 'pending':
+        return redirect(url_for('index'))
+
+    db_sess = db_session.create_session()
+    user = db_sess.query(UserModel).filter(
+        UserModel.id == session['user_id']).first()
+
+    if not user:
+        db_sess.close()
+        return redirect(url_for('login'))
+
+    existing_page = db_sess.query(BandPageModel).filter(
+        BandPageModel.band_id == user.id).first()
+    if existing_page:
+        db_sess.close()
+        return redirect(url_for('edit_band_page', page_id=existing_page.id))
+
+    if request.method == 'POST':
+        title = request.form.get('title', '')
+        description = request.form.get('description', '')
+        content = request.form.get('content', '')
+
+        cover_image = None
+        if request.files.get('cover_image'):
+            file = request.files.get('cover_image')
+            if file and file.filename:
+                filename = secure_filename(file.filename)
+                cover_folder = os.path.join('static', 'images', 'band_covers')
+                os.makedirs(cover_folder, exist_ok=True)
+                file_path = os.path.join(cover_folder, f"{user.id}_{filename}")
+                file.save(file_path)
+                cover_image = f"/static/images/band_covers/{user.id}_{filename}"
+
+        band_page = BandPageModel(
+            band_id=user.id,
+            title=title,
+            description=description,
+            content=content,
+            cover_image=cover_image,
+            is_published=True
+        )
+
+        db_sess.add(band_page)
+        db_sess.commit()
+        db_sess.close()
+
+        return redirect(url_for('view_band_page', page_id=band_page.id))
+
+    db_sess.close()
+    return render_template('create_band_page.html')
+
+
+@app.route('/band_page/<int:page_id>/edit', methods=['GET', 'POST'])
+def edit_band_page(page_id):
+    if 'user_id' not in session or session.get('role') != 'band':
+        return redirect(url_for('login'))
+
+    db_sess = db_session.create_session()
+    band_page = db_sess.query(BandPageModel).filter(
+        BandPageModel.id == page_id).first()
+
+    if not band_page or band_page.band_id != session['user_id']:
+        db_sess.close()
+        return redirect(url_for('index'))
+
+    if request.method == 'POST':
+        band_page.title = request.form.get('title', '')
+        band_page.description = request.form.get('description', '')
+        band_page.content = request.form.get('content', '')
+        band_page.updated_date = datetime.datetime.now()
+
+        if request.files.get('cover_image'):
+            file = request.files.get('cover_image')
+            if file and file.filename:
+                filename = secure_filename(file.filename)
+                cover_folder = os.path.join('static', 'images', 'band_covers')
+                os.makedirs(cover_folder, exist_ok=True)
+                file_path = os.path.join(
+                    cover_folder, f"{session['user_id']}_{filename}")
+                file.save(file_path)
+                band_page.cover_image = f"/static/images/band_covers/{session['user_id']}_{filename}"
+
+        db_sess.commit()
+        db_sess.close()
+
+        return redirect(url_for('view_band_page', page_id=page_id))
+
+    db_sess.close()
+    return render_template('edit_band_page.html', band_page=band_page)
+
+
+@app.route('/band_page/<int:page_id>')
+def view_band_page(page_id):
+    db_sess = db_session.create_session()
+    band_page = db_sess.query(BandPageModel).filter(
+        BandPageModel.id == page_id).first()
+
+    if not band_page:
+        db_sess.close()
+        return redirect(url_for('index'))
+
+    band_page.views += 1
+    db_sess.commit()
+
+    band = db_sess.query(UserModel).filter(
+        UserModel.id == band_page.band_id).first()
+
+    db_sess.close()
+    return render_template('view_band_page.html', band_page=band_page, band=band)
+
+
 @app.route('/logout')
 def logout():
     lang = session.get('lang', 'ru')
@@ -286,4 +429,4 @@ def logout():
 if __name__ == '__main__':
     db_session.global_init("db/music_crm.sqlite")
     default_data()
-    app.run(debug=True)
+    app.run(host='127.0.0.1', port=8000, debug=True)

@@ -1,44 +1,123 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="container d-flex justify-content-center" style="min-height: 70vh;">
-    <div class="custom-card card-home text-center">
-        
-        <div class="search-wrapper d-flex align-items-center justify-content-center gap-3 mb-4">
-            {% if session.get('user_id') and session.get('role') == 'band' %}
-            <div class="page-action-btn">
-                <button class="btn-pencil" id="pencil-btn">✏️</button>
-                <div class="page-menu" id="page-menu">
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="custom-card card-home">
+                {% if session.get('user_id') and session.get('role') == 'band' %}
+                <div class="text-end mb-3">
                     {% if show_pending %}
-                    <div class="menu-item disabled">
+                    <button class="btn-back" id="pending-btn" onclick="togglePendingMessage()">✏️</button>
+                    <div id="pending-message" class="alert alert-warning mt-2 d-none">
                         ⚠️ {{ txt.pending_message }}
                     </div>
                     {% elif band_page %}
-                    <div class="menu-item">
-                        <a href="/band_page/{{ band_page.id }}/edit">{{ txt.edit_page }}</a>
-                    </div>
-                    <div class="menu-item">
-                        <a href="/band_page/{{ band_page.id }}" target="_blank">{{ txt.my_page }}</a>
-                    </div>
+                    <a href="/band_page/{{ band_page.id }}/edit" class="btn-back">✏️ {{ txt.edit_page }}</a>
+                    <a href="/band_page/{{ band_page.id }}" class="btn-back ms-2">📄 {{ txt.my_page }}</a>
                     {% else %}
-                    <div class="menu-item">
-                        <a href="/band_page/create">➕ {{ txt.create_page }}</a>
-                    </div>
+                    <a href="/band_page/create" class="btn-back">➕ {{ txt.create_page }}</a>
                     {% endif %}
                 </div>
+                {% endif %}
+                
+                <form action="{{ url_for('search') }}" method="GET" class="search-container" id="searchForm">
+                    <input type="text" name="q" class="input" id="searchInput" placeholder="{{ txt.search_place }}" value="{{ request.args.get('q', '') }}" autocomplete="off">
+                    <div class="suggestions-box" id="suggestionsBox"></div>
+                    <button type="submit" class="btn-search">{{ txt.send }}</button>
+                    
+                    {% if not session.get('user_id') %}
+                    <div class="text-center mt-3 text-white-50">
+                        {{ txt.platform_desc }}
+                    </div>
+                    {% endif %}
+                </form>
             </div>
-            {% endif %}
-            
-            <form action="{{ url_for('search') }}" method="GET" class="search-form flex-grow-1">
-                <input type="text" name="q" class="input" placeholder="{{ txt.search_place }}">
-                <button type="submit" class="btn-reg mt-2">{{ txt.send }}</button>
-            </form>
         </div>
-        
-        {% if not session.get('user_id') %}
-        <p class="text-white-50 mt-3">{{ txt.platform_desc }}</p>
-        {% endif %}
     </div>
 </div>
 
-<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+<script>
+const searchInput = document.getElementById('searchInput');
+const suggestionsBox = document.getElementById('suggestionsBox');
+let debounceTimer;
+
+searchInput.addEventListener('input', function() {
+    clearTimeout(debounceTimer);
+    const query = this.value.trim();
+    
+    if (query.length === 0) {
+        suggestionsBox.innerHTML = '';
+        suggestionsBox.style.display = 'none';
+        return;
+    }
+    
+    debounceTimer = setTimeout(() => {
+        fetchSuggestions(query);
+    }, 300);
+});
+
+async function fetchSuggestions(query) {
+    try {
+        const response = await fetch(`/api/search_bands?q=${encodeURIComponent(query)}`);
+        const bands = await response.json();
+        
+        displaySuggestions(bands);
+    } catch (error) {
+        console.error('Error fetching suggestions:', error);
+    }
+}
+
+function displaySuggestions(bands) {
+    if (bands.length === 0) {
+        suggestionsBox.innerHTML = '<div class="suggestion-item text-white-50">{{ txt.no_results }}</div>';
+        suggestionsBox.style.display = 'block';
+        return;
+    }
+    
+    let html = '';
+    bands.forEach(band => {
+        html += `
+            <div class="suggestion-item" onclick="selectBand('${band.name}')">
+                <strong>${highlightMatch(band.name, searchInput.value)}</strong>
+                <small class="text-white-50 d-block">@${band.username}</small>
+            </div>
+        `;
+    });
+    
+    suggestionsBox.innerHTML = html;
+    suggestionsBox.style.display = 'block';
+}
+
+function highlightMatch(text, query) {
+    const regex = new RegExp(`(${query})`, 'gi');
+    return text.replace(regex, '<span style="color: #9d4edd;">$1</span>');
+}
+
+function selectBand(bandName) {
+    searchInput.value = bandName;
+    suggestionsBox.innerHTML = '';
+    suggestionsBox.style.display = 'none';
+    document.getElementById('searchForm').submit();
+}
+
+document.addEventListener('click', function(e) {
+    if (!e.target.closest('.search-container')) {
+        suggestionsBox.innerHTML = '';
+        suggestionsBox.style.display = 'none';
+    }
+});
+
+searchInput.addEventListener('focus', function() {
+    if (this.value.trim().length > 0 && suggestionsBox.children.length > 0) {
+        suggestionsBox.style.display = 'block';
+    }
+});
+
+function togglePendingMessage() {
+    const msg = document.getElementById('pending-message');
+    if (msg) {
+        msg.classList.toggle('d-none');
+    }
+}
+</script>
 {% endblock %}

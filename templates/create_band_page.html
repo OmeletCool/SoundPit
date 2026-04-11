@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="custom-card">
+                <h2 class="page-title text-center mb-4">{{ txt.create_page }}</h2>
+                
+                <form method="POST" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label class="text-white-50">{{ txt.band_name }}</label>
+                        <input type="text" name="title" class="input" placeholder="{{ txt.band_name }}" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="text-white-50">{{ txt.about_band }}</label>
+                        <textarea name="description" class="input" rows="3" placeholder="{{ txt.about_band }}"></textarea>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="text-white-50">{{ txt.content }}</label>
+                        <textarea name="content" class="input" rows="10" placeholder="{{ txt.content_placeholder }}"></textarea>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="text-white-50">{{ txt.cover_image }}</label>
+                        <input type="file" name="cover_image" class="form-control" accept="image/*" style="background: #1a1a1a; color: white; border: 1px solid rgba(255,255,255,0.2);">
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn-search">{{ txt.create_page }}</button>
+                        <a href="{{ url_for('index') }}" class="btn-back text-center">{{ txt.back }}</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

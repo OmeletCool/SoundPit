@@ -58,6 +58,20 @@ body {
     font-size: 0.9rem;
 }
 
+.lang-dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.lang-dropdown .dropdown-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    left: auto;
+    min-width: 80px;
+    margin-top: 5px;
+}
+
 .dropdown-menu {
     z-index: 1002;
     background: #1a1a1a;
@@ -73,6 +87,22 @@ body {
     color: #9d4edd;
 }
 
+.btn-lang {
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: #e0d7f2;
+    padding: 5px 15px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    transition: 0.3s;
+    cursor: pointer;
+}
+
+.btn-lang:hover {
+    border-color: #9d4edd;
+    color: #9d4edd;
+}
+
 .input {
     background-color: #1a1a1a;
     width: 100%;
@@ -83,6 +113,8 @@ body {
     color: white;
     text-align: center;
     transition: .2s;
+    position: relative;
+    z-index: 1004;
 }
 
 .input:focus {
@@ -105,6 +137,7 @@ body {
     max-width: 550px;
     margin: 0 auto;
     position: relative;
+    width: 100%;
 }
 
 .search-container .input {
@@ -113,15 +146,17 @@ body {
 
 .suggestions-box {
     position: absolute;
-    top: 55px;
+    top: 60px;
     left: 0;
     right: 0;
     background: #1a1a1a;
     border: 1px solid rgba(157, 78, 221, 0.3);
     border-radius: 8px;
-    max-height: 200px;
+    max-height: 300px;
     overflow-y: auto;
     z-index: 1003;
+    display: none;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
 }
 
 .suggestions-box:has(.suggestion-item) {
@@ -129,19 +164,26 @@ body {
 }
 
 .suggestion-item {
-    padding: 10px 15px;
+    padding: 12px 15px;
     cursor: pointer;
     transition: 0.2s;
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
 }
 
 .suggestion-item:hover {
     background: rgba(157, 78, 221, 0.2);
-    color: #9d4edd;
 }
 
 .suggestion-item:last-child {
     border-bottom: none;
+}
+
+.suggestion-item small {
+    font-size: 0.8rem;
+    opacity: 0.7;
 }
 
 .btn-search {
@@ -359,10 +401,13 @@ body {
     text-decoration: none;
     border: 1px solid rgba(255, 255, 255, 0.1);
     transition: 0.3s;
+    display: inline-block;
+    white-space: nowrap;
 }
 
 .btn-back:hover {
     background: #9d4edd;
+    color: white;
 }
 
 .nav-link {
@@ -483,4 +528,97 @@ body {
 
 .border-secondary {
     border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.text-center {
+    text-align: center !important;
+}
+
+.text-end {
+    text-align: right !important;
+}
+
+.mb-2 {
+    margin-bottom: 0.5rem !important;
+}
+
+.mb-3 {
+    margin-bottom: 1rem !important;
+}
+
+.mb-4 {
+    margin-bottom: 1.5rem !important;
+}
+
+.mt-2 {
+    margin-top: 0.5rem !important;
+}
+
+.mt-3 {
+    margin-top: 1rem !important;
+}
+
+.mt-5 {
+    margin-top: 3rem !important;
+}
+
+.ms-2 {
+    margin-left: 0.5rem !important;
+}
+
+.d-none {
+    display: none !important;
+}
+
+.d-block {
+    display: block !important;
+}
+
+.w-100 {
+    width: 100% !important;
+}
+
+.content-section {
+    line-height: 1.6;
+    font-size: 1.1rem;
+}
+
+.content-section h1,
+.content-section h2,
+.content-section h3 {
+    color: #9d4edd;
+    margin-top: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.content-section p {
+    margin-bottom: 1rem;
+}
+
+.form-control {
+    display: block;
+    width: 100%;
+    padding: 0.5rem;
+    font-size: 1rem;
+    line-height: 1.5;
+    border-radius: 8px;
+}
+
+.img-fluid {
+    max-width: 100%;
+    height: auto;
+}
+
+@media (max-width: 768px) {
+    .navbar-brand {
+        font-size: 1.8rem;
+    }
+
+    .search-container {
+        max-width: 100%;
+    }
+
+    .card-home {
+        padding: 30px 20px;
+    }
 }

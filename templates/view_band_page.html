@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="custom-card">
+                {% if band_page.cover_image %}
+                <div class="text-center mb-4">
+                    <img src="{{ band_page.cover_image }}" alt="{{ band_page.title or band.name }}" class="img-fluid" style="border-radius: 20px; max-height: 400px; width: 100%; object-fit: cover;">
+                </div>
+                {% endif %}
+                
+                <h1 class="gradient-title text-center mb-3">{{ band_page.title or band.name }}</h1>
+                
+                <div class="text-center mb-4">
+                    <span class="status-badge certified">✓ {{ txt.certified }}</span>
+                    <span class="text-white-50 ms-3">👁 {{ band_page.views }} {{ txt.views }}</span>
+                    <span class="text-white-50 ms-3">📅 {{ band_page.created_date.strftime('%d.%m.%Y') if band_page.created_date else '' }}</span>
+                </div>
+                
+                {% if band_page.description %}
+                <div class="alert alert-secondary text-center mb-4">
+                    {{ band_page.description }}
+                </div>
+                {% endif %}
+                
+                {% if band_page.content %}
+                <div class="content-section mb-4 p-3" style="background: rgba(0,0,0,0.2); border-radius: 15px;">
+                    {{ band_page.content | safe }}
+                </div>
+                {% endif %}
+                
+                <div class="d-grid gap-2">
+                    {% if session.get('user_id') == band.band_id %}
+                    <a href="{{ url_for('edit_band_page', page_id=band_page.id) }}" class="btn-back text-center">{{ txt.edit_page }}</a>
+                    {% endif %}
+                    <a href="{{ url_for('index') }}" class="btn-back text-center">{{ txt.back }}</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

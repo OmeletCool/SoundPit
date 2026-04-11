@@ -68,7 +68,15 @@
         "edit_page": "Редактировать страничку",
         "create_page": "Создать страничку",
         "pending_message": "Вы не можете создавать страничку, пока Ваш аккаунт не подтвержден модератором",
-        "my_page": "Моя страничка"
+        "my_page": "Моя страничка",
+        "enter_login": "Введите логин",
+        "enter_password": "Введите пароль",
+        "content": "Контент",
+        "content_placeholder": "Расскажите о вашей группе, музыке, достижениях...",
+        "cover_image": "Обложка",
+        "save_changes": "Сохранить изменения",
+        "views": "просмотров",
+        "no_results": "Ничего не найдено"
     },
     "en": {
         "login": "LOGIN",
@@ -139,7 +147,15 @@
         "edit_page": "Edit Page",
         "create_page": "Create Page",
         "pending_message": "You cannot create a page until your account is confirmed by a moderator",
-        "my_page": "My Page"
+        "my_page": "My Page",
+        "enter_login": "Enter login",
+        "enter_password": "Enter password",
+        "content": "Content",
+        "content_placeholder": "Tell about your band, music, achievements...",
+        "cover_image": "Cover Image",
+        "save_changes": "Save Changes",
+        "views": "views",
+        "no_results": "No results found"
     },
     "sq": {
         "login": "HYRJE",
@@ -210,6 +226,14 @@
         "edit_page": "Redakto Faqen",
         "create_page": "Krijo Faqe",
         "pending_message": "Nuk mund të krijoni faqe derisa llogaria juaj të konfirmohet nga moderatori",
-        "my_page": "Faqja Ime"
+        "my_page": "Faqja Ime",
+        "enter_login": "Vendos login",
+        "enter_password": "Vendos fjalëkalimin",
+        "content": "Përmbajtja",
+        "content_placeholder": "Tregoni për bandën tuaj, muzikën, arritjet...",
+        "cover_image": "Imazhi i Kopertinës",
+        "save_changes": "Ruaj Ndryshimet",
+        "views": "shikime",
+        "no_results": "Asnjë rezultat"
     }
 }
