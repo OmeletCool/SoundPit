@@ -20,14 +20,15 @@
                     <button class="role-btn" onclick="switchTab('register')">{{ txt.reg }}</button>
                 </div>
                 
+                <!-- Вкладка ВХОД -->
                 <div id="login-tab" class="{% if active_tab != 'register' %}d-block{% else %}d-none{% endif %}">
                     <form method="POST">
                         {{ login_form.hidden_tag() }}
                         <div class="mb-3">
-                            {{ login_form.username(class="input", placeholder=txt.enter_login, id="login-username") }}
+                            {{ login_form.username(class="input", placeholder=txt.enter_login) }}
                         </div>
                         <div class="mb-3">
-                            {{ login_form.password(class="input", placeholder=txt.enter_password, id="login-password") }}
+                            {{ login_form.password(class="input", placeholder=txt.enter_password) }}
                         </div>
                         <div class="d-grid">
                             <button type="submit" name="submit_login" class="btn-search">{{ txt.submit_login }}</button>
@@ -35,6 +36,7 @@
                     </form>
                 </div>
                 
+                <!-- Вкладка РЕГИСТРАЦИЯ -->
                 <div id="register-tab" class="{% if active_tab == 'register' %}d-block{% else %}d-none{% endif %}">
                     <form method="POST" enctype="multipart/form-data">
                         {{ reg_form.hidden_tag() }}
@@ -53,36 +55,31 @@
                             </div>
                         </div>
                         
+                        <!-- Поля логина и пароля убраны -->
+                        
                         <div class="mb-3">
-                            {{ reg_form.username(class="input", id="username-field", placeholder=txt.create_login) }}
+                            {{ reg_form.name(class="input", placeholder=txt.your_name) }}
                         </div>
                         
                         <div class="mb-3">
-                            {{ reg_form.name(class="input", id="name-field", placeholder=txt.your_name) }}
+                            {{ reg_form.email(class="input", placeholder=txt.email) }}
                         </div>
                         
                         <div class="mb-3">
-                            {{ reg_form.email(class="input", placeholder=txt.email, id="reg-email") }}
-                        </div>
-                        
-                        <div class="mb-3">
-                            {{ reg_form.password(class="input", id="reg-password", placeholder=txt.password) }}
-                        </div>
-                        
-                        <div class="mb-3">
-                            {{ reg_form.password_again(class="input", id="reg-password-again", placeholder=txt.repeat_password) }}
-                        </div>
-                        <div id="password-error" class="text-danger text-center d-none">{{ txt.passwords_mismatch }}</div>
-                        
-                        <div class="mb-3">
-                            {{ reg_form.about(class="input", id="about-field", placeholder=txt.about, rows="3") }}
+                            {{ reg_form.about(class="input", placeholder=txt.about, rows=3) }}
                         </div>
                         
                         <div id="band-fields" class="d-none">
                             <div class="upload-box mb-3">
                                 <label class="text-white-50 d-block mb-2">📋 {{ txt.documents }}</label>
                                 <small class="text-white-50 d-block mb-2">{{ txt.docs_hint }}</small>
-                                {{ reg_form.documents(class="form-control", style="background: #1a1a1a; color: white; border: 1px solid rgba(255,255,255,0.2);") }}
+                                {{ reg_form.documents(class="form-control") }}
+                            </div>
+                            <div class="mb-3">
+                                <input type="text" name="inn" class="input" placeholder="{{ txt.inn }}">
+                            </div>
+                            <div class="mb-3">
+                                <input type="text" name="rkn_number" class="input" placeholder="{{ txt.rkn }}">
                             </div>
                         </div>
                         
@@ -129,20 +126,6 @@ function toggleBandFields(show) {
         aboutField.placeholder = "{{ txt.about }}";
         nameField.placeholder = "{{ txt.your_name }}";
     }
-}
-
-const pass1 = document.getElementById('reg-password');
-const pass2 = document.getElementById('reg-password-again');
-const errorMsg = document.getElementById('password-error');
-
-if(pass1 && pass2) {
-    pass2.addEventListener('input', function() {
-        if (pass1.value !== pass2.value) {
-            errorMsg.classList.remove('d-none');
-        } else {
-            errorMsg.classList.add('d-none');
-        }
-    });
 }
 </script>
 {% endblock %}

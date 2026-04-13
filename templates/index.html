@@ -2,10 +2,10 @@
 {% block content %}
 <div class="container mt-5">
     <div class="row justify-content-center">
-        <div class="col-12">
+        <div class="col-md-8">
             <div class="custom-card card-home">
                 {% if session.get('user_id') and session.get('role') == 'band' %}
-                <div class="text-end mb-3 w-100">
+                <div class="text-end mb-3">
                     {% if show_pending %}
                     <button class="btn-back" id="pending-btn" onclick="togglePendingMessage()">✏️</button>
                     <div id="pending-message" class="alert alert-warning mt-2 d-none">
@@ -45,7 +45,7 @@ searchInput.addEventListener('input', function() {
     clearTimeout(debounceTimer);
     const query = this.value.trim();
     
-    if (query.length === 0) {
+    if (query.length < 2) {
         suggestionsBox.innerHTML = '';
         suggestionsBox.style.display = 'none';
         return;
@@ -77,7 +77,7 @@ function displaySuggestions(bands) {
     let html = '';
     bands.forEach(band => {
         html += `
-            <div class="suggestion-item" onclick="selectBand('${band.title}')">
+            <div class="suggestion-item" onclick="selectBand('${band.page_id}')">
                 <strong>${highlightMatch(band.title, searchInput.value)}</strong>
                 <small class="text-white-50 d-block">@${band.username}</small>
             </div>
@@ -89,15 +89,13 @@ function displaySuggestions(bands) {
 }
 
 function highlightMatch(text, query) {
+    if (!query) return text;
     const regex = new RegExp(`(${query})`, 'gi');
     return text.replace(regex, '<span style="color: #9d4edd;">$1</span>');
 }
 
-function selectBand(bandName) {
-    searchInput.value = bandName;
-    suggestionsBox.innerHTML = '';
-    suggestionsBox.style.display = 'none';
-    document.getElementById('searchForm').submit();
+function selectBand(pageId) {
+    window.location.href = `/band_page/${pageId}`;
 }
 
 document.addEventListener('click', function(e) {
@@ -108,7 +106,7 @@ document.addEventListener('click', function(e) {
 });
 
 searchInput.addEventListener('focus', function() {
-    if (this.value.trim().length > 0 && suggestionsBox.children.length > 0) {
+    if (this.value.trim().length >= 2 && suggestionsBox.children.length > 0) {
         suggestionsBox.style.display = 'block';
     }
 });
