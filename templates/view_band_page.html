@@ -14,8 +14,20 @@
                 
                 <div class="text-center mb-4">
                     <span class="status-badge certified">✓ {{ txt.certified }}</span>
-                    <span class="text-white-50 ms-3">👁 {{ band_page.views }} {{ txt.views }}</span>
-                    <span class="text-white-50 ms-3">📅 {{ band_page.created_date.strftime('%d.%m.%Y') if band_page.created_date else '' }}</span>
+                    
+                    <!-- Система рейтинга -->
+                    <span class="rating-container ms-3">
+                        <span class="star" data-value="1" onclick="rateBand(1)">★</span>
+                        <span class="star" data-value="2" onclick="rateBand(2)">★</span>
+                        <span class="star" data-value="3" onclick="rateBand(3)">★</span>
+                        <span class="star" data-value="4" onclick="rateBand(4)">★</span>
+                        <span class="star" data-value="5" onclick="rateBand(5)">★</span>
+                        <span id="rating-text" class="ms-2 text-white-50" style="font-size: 0.9rem;">
+                            {{ "%.1f"|format(band_page.rating) if band_page.rating > 0 else "Нет оценок" }} ({{ band_page.votes }})
+                        </span>
+                    </span>
+
+                    <span class="text-white-50 ms-3"> {{ band_page.created_date.strftime('%d.%m.%Y') if band_page.created_date else '' }}</span>
                 </div>
                 
                 {% if band_page.description %}
@@ -40,4 +52,63 @@
         </div>
     </div>
 </div>
+
+<script>
+const stars = document.querySelectorAll('.star');
+stars.forEach(star => {
+    star.addEventListener('mouseover', function() {
+        highlightStars(this.dataset.value);
+    });
+    star.addEventListener('mouseout', function() {
+        resetStars();
+    });
+});
+
+function highlightStars(value) {
+    stars.forEach(s => {
+        if (s.dataset.value <= value) {
+            s.style.color = '#ffc107';
+        } else {
+            s.style.color = 'rgba(255,255,255,0.3)';
+        }
+    });
+}
+
+function resetStars() {
+    stars.forEach(s => {
+        s.style.color = 'rgba(255,255,255,0.3)'; 
+    });
+}
+
+const currentRating = {{ band_page.rating }};
+if (currentRating > 0) {
+    stars.forEach(s => {
+        if (parseInt(s.dataset.value) <= Math.round(currentRating)) {
+            s.style.color = '#ffc107';
+        }
+    });
+}
+
+function rateBand(score) {
+    highlightStars(score);
+    
+    fetch(`/api/rate_band/{{ band_page.id }}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ score: score })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.new_rating !== undefined) {
+            document.getElementById('rating-text').innerText = 
+                `${data.new_rating.toFixed(1)} (${data.votes})`;
+        } else {
+            alert(data.error || 'Ошибка');
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}
+</script>
 {% endblock %}

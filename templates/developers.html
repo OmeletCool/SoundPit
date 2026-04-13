@@ -4,7 +4,7 @@
     <h2 class="page-title mb-4 text-center">{{ txt.admin_panel }}</h2>
     
     <div class="custom-card mb-4">
-        <h3 class="text-warning text-center">📋 {{ txt.pending_apps }} ({{ pending_bands|length }})</h3>
+        <h3 class="text-warning text-center"> {{ txt.pending_apps }} ({{ pending_bands|length }})</h3>
         {% if pending_bands %}
             <div class="table-responsive">
                 <table class="table table-dark">
@@ -29,12 +29,12 @@
                             <td>{{ band.rep_name or '-' }}</td>
                             <td>
                                 {% if band.docs_path %}
-                                <a href="{{ band.docs_path }}" class="btn btn-sm btn-info" download>📄</a>
+                                <a href="{{ band.docs_path }}" class="btn btn-sm btn-info" download></a>
                                 {% else %}-{% endif %}
                             </td>
                             <td>
-                                <a href="{{ url_for('approve_band', band_id=band.id) }}" class="btn btn-sm btn-success">✓</a>
-                                <a href="{{ url_for('reject_band', band_id=band.id) }}" class="btn btn-sm btn-danger">✕</a>
+                                <a href="{{ url_for('approve_band', band_id=band.id) }}" class="btn btn-sm btn-success">+</a>
+                                <a href="{{ url_for('reject_band', band_id=band.id) }}" class="btn btn-sm btn-danger">-</a>
                             </td>
                         </tr>
                         {% endfor %}
@@ -47,7 +47,7 @@
     </div>
     
     <div class="custom-card">
-        <h3 class="text-success text-center">✅ {{ txt.approved_bands }} ({{ approved_bands|length }})</h3>
+        <h3 class="text-success text-center"> {{ txt.approved_bands }} ({{ approved_bands|length }})</h3>
         {% if approved_bands %}
             <div class="table-responsive">
                 <table class="table table-dark">

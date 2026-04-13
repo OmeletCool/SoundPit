@@ -24,5 +24,7 @@ class BandPageModel(SqlAlchemyBase):
     updated_date = sqlalchemy.Column(
         sqlalchemy.DateTime, default=datetime.datetime.now, onupdate=datetime.datetime.now)
 
-    views = sqlalchemy.Column(sqlalchemy.Integer, default=0)
+    rating = sqlalchemy.Column(sqlalchemy.Float, default=0.0)
+    votes = sqlalchemy.Column(sqlalchemy.Integer, default=0)
+    
     is_published = sqlalchemy.Column(sqlalchemy.Boolean, default=False)

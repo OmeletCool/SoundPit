@@ -5,14 +5,10 @@
         <div class="col-md-6">
             <div class="custom-card card-auth">
                 {% if warning_message %}
-                <div class="alert alert-warning text-center">
-                    ⚠️ {{ warning_message }}
-                </div>
+                <div class="alert alert-warning text-center">⚠️ {{ warning_message }}</div>
                 {% endif %}
                 {% if error %}
-                <div class="alert alert-danger text-center">
-                    ⚠️ {{ error }}
-                </div>
+                <div class="alert alert-danger text-center">⚠️ {{ error }}</div>
                 {% endif %}
                 
                 <div class="role-tabs mb-4">
@@ -20,9 +16,8 @@
                     <button class="role-btn" onclick="switchTab('register')">{{ txt.reg }}</button>
                 </div>
                 
-                <!-- Вкладка ВХОД -->
                 <div id="login-tab" class="{% if active_tab != 'register' %}d-block{% else %}d-none{% endif %}">
-                    <form method="POST">
+                    <form method="POST" action="{{ url_for('login') }}">
                         {{ login_form.hidden_tag() }}
                         <div class="mb-3">
                             {{ login_form.username(class="input", placeholder=txt.enter_login) }}
@@ -36,9 +31,8 @@
                     </form>
                 </div>
                 
-                <!-- Вкладка РЕГИСТРАЦИЯ -->
                 <div id="register-tab" class="{% if active_tab == 'register' %}d-block{% else %}d-none{% endif %}">
-                    <form method="POST" enctype="multipart/form-data">
+                    <form method="POST" action="{{ url_for('login') }}" enctype="multipart/form-data">
                         {{ reg_form.hidden_tag() }}
                         
                         <div class="mb-3">
@@ -55,7 +49,9 @@
                             </div>
                         </div>
                         
-                        <!-- Поля логина и пароля убраны -->
+                        <div class="mb-3">
+                            {{ reg_form.username(class="input", placeholder=txt.create_login) }}
+                        </div>
                         
                         <div class="mb-3">
                             {{ reg_form.name(class="input", placeholder=txt.your_name) }}
@@ -63,6 +59,10 @@
                         
                         <div class="mb-3">
                             {{ reg_form.email(class="input", placeholder=txt.email) }}
+                        </div>
+                        
+                        <div class="mb-3">
+                            {{ reg_form.password(class="input", placeholder=txt.password) }}
                         </div>
                         
                         <div class="mb-3">
@@ -101,12 +101,16 @@ function switchTab(tab) {
     
     if (tab === 'login') {
         loginTab.classList.remove('d-none');
+        loginTab.classList.add('d-block');
         registerTab.classList.add('d-none');
+        registerTab.classList.remove('d-block');
         btns[0].classList.add('active');
         btns[1].classList.remove('active');
     } else {
         loginTab.classList.add('d-none');
+        loginTab.classList.remove('d-block');
         registerTab.classList.remove('d-none');
+        registerTab.classList.add('d-block');
         btns[0].classList.remove('active');
         btns[1].classList.add('active');
     }

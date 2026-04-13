@@ -45,68 +45,6 @@ body {
     color: #c77dff;
 }
 
-.navbar-container {
-    position: relative; /* Важно для центрирования логотипа */
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 15px 20px;
-}
-
-/* Центрирование логотипа SOUNDHOLE */
-.navbar-center {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 1000;
-}
-
-.navbar-brand {
-    font-size: 2.5rem;
-    font-weight: 900;
-    color: #9d4edd;
-    text-shadow: 0 0 20px rgba(157, 78, 221, 0.6);
-    text-decoration: none;
-    white-space: nowrap;
-    margin: 0; /* Убираем лишние отступы */
-}
-
-/* Выравнивание языка слева */
-.navbar-left {
-    z-index: 1001;
-    display: flex;
-    align-items: center;
-}
-
-/* Исправление выпадающего меню языка (теперь слева, поэтому открывается вправо) */
-.navbar-left .lang-dropdown .dropdown-menu {
-    left: 0;
-    right: auto;
-}
-
-.navbar-right {
-    z-index: 1001;
-    display: flex;
-    align-items: center;
-}
-
-/* Группа действий пользователя (Имя + Выход) */
-.user-actions {
-    display: flex;
-    align-items: center;
-    gap: 15px; /* Отступ между именем и кнопкой выйти */
-}
-
-.nav-link {
-    color: #e0d7f2 !important;
-    transition: 0.3s;
-    margin: 0 5px;
-}
-
-.nav-link:hover {
-    color: #9d4edd !important;
-}
-
 .page-title {
     font-size: 1.5rem;
     font-weight: 700;
@@ -194,22 +132,21 @@ body {
     display: flex;
     flex-direction: column;
     justify-content: center;
-    align-items: center; /* Центрирует кнопку внутри формы */
+    align-items: center;
     gap: 10px;
     max-width: 550px;
-    margin: 0 auto; /* Центрирует саму форму на странице */
+    margin: 0 auto;
     position: relative;
     width: 100%;
 }
 
 .search-container .input {
     width: 100%;
-    box-sizing: border-box;
 }
 
 .suggestions-box {
     position: absolute;
-    top: calc(100% + 5px);
+    top: 60px;
     left: 0;
     right: 0;
     background: #1a1a1a;
@@ -220,7 +157,6 @@ body {
     z-index: 1003;
     display: none;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
-    width: 100%;
 }
 
 .suggestions-box:has(.suggestion-item) {
@@ -685,4 +621,26 @@ body {
     .card-home {
         padding: 30px 20px;
     }
+}
+
+.rating-container {
+    display: inline-flex;
+    align-items: center;
+}
+
+.star {
+    font-size: 1.5rem;
+    color: rgba(255, 255, 255, 0.3); /* Серый по умолчанию */
+    cursor: pointer;
+    transition: color 0.2s, transform 0.1s;
+    margin: 0 2px;
+    user-select: none;
+}
+
+.star:hover {
+    transform: scale(1.2);
+}
+
+.star.active {
+    color: #ffc107; /* Золотой */
 }
