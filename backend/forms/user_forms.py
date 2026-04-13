@@ -11,13 +11,9 @@ class LoginForm(FlaskForm):
 
 
 class RegisterForm(FlaskForm):
-    username = StringField('Логин', validators=[DataRequired()])
-    email = EmailField('Email', validators=[Optional()])
+    # Убрали username и password отсюда
+    email = EmailField('Email', validators=[DataRequired()]) # Сделали обязательным
     name = StringField('Имя / Название группы', validators=[DataRequired()])
-    password = PasswordField('Пароль', validators=[DataRequired()])
-    password_again = PasswordField('Повторите пароль', validators=[
-        DataRequired(), EqualTo('password', message='Пароли должны совпадать')
-    ])
     about = TextAreaField('О себе / О группе')
     inn = StringField('ИНН', validators=[Optional()])
     rkn_number = StringField(

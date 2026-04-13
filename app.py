@@ -68,23 +68,28 @@ def api_search_bands():
     query = request.args.get('q', '').strip().lower()
     db_sess = db_session.create_session()
 
-    if query:
-        bands = db_sess.query(UserModel).filter(
+    if query and 'user_id' in session:
+        pages = db_sess.query(BandPageModel).join(
+            UserModel, BandPageModel.band_id == UserModel.id
+        ).filter(
             UserModel.role == 'band',
             UserModel.status == 'active',
-            sqlalchemy.func.lower(UserModel.name).contains(query)
+            sqlalchemy.or_(
+                sqlalchemy.func.lower(BandPageModel.title).contains(query),
+                sqlalchemy.func.lower(UserModel.name).contains(query)
+            )
         ).limit(10).all()
+        
+        result = [
+            {
+                'page_id': page.id,
+                'title': page.title or page.band.name,
+                'username': page.band.username
+            }
+            for page in pages
+        ]
     else:
-        bands = []
-
-    result = [
-        {
-            'id': band.id,
-            'name': band.name,
-            'username': band.username
-        }
-        for band in bands
-    ]
+        result = []
 
     db_sess.close()
     return json.dumps(result, ensure_ascii=False)
@@ -100,8 +105,12 @@ def login():
     if request.method == 'POST' and 'submit_login' in request.form:
         if login_form.validate_on_submit():
             db_sess = db_session.create_session()
+            # Теперь логин может быть и email
             user = db_sess.query(UserModel).filter(
-                UserModel.username == login_form.username.data
+                sqlalchemy.or_(
+                    UserModel.username == login_form.username.data,
+                    UserModel.email == login_form.username.data
+                )
             ).first()
 
             if user and user.check_password(login_form.password.data):
@@ -127,48 +136,23 @@ def login():
 
     elif request.method == 'POST' and 'submit_register' in request.form:
         active_tab = 'register'
-        password = request.form.get('password', '')
-        password_again = request.form.get('password_again', '')
+        
         email = request.form.get('email', '')
-        username = request.form.get('username', '')
+        # Так как полей логина/пароля нет, используем email как логин и пароль
+        username = email 
+        password = email 
 
-        if len(password) < 8 or len(password) > 32:
+        if not email:
             error = TRANSLATIONS.get(session.get('lang', 'ru'), {}).get(
-                'password_length', 'Пароль должен быть от 8 до 32 символов')
-            return render_template('login.html', login_form=login_form, reg_form=reg_form,
-                                   error=error, active_tab=active_tab)
-
-        if not re.search(r'[a-zA-Z]', password) or not re.search(r'[0-9]', password):
-            error = TRANSLATIONS.get(session.get('lang', 'ru'), {}).get(
-                'password_chars', 'Пароль должен содержать буквы и цифры')
-            return render_template('login.html', login_form=login_form, reg_form=reg_form,
-                                   error=error, active_tab=active_tab)
-
-        if password != password_again:
-            error = TRANSLATIONS.get(session.get('lang', 'ru'), {}).get(
-                'passwords_mismatch', 'Пароли не совпадают')
-            return render_template('login.html', login_form=login_form, reg_form=reg_form,
-                                   error=error, active_tab=active_tab)
-
-        email_regex = r'^[^\s@]+@[^\s@]+\.[^\s@]+$'
-        if email and not re.match(email_regex, email):
-            error = TRANSLATIONS.get(session.get('lang', 'ru'), {}).get(
-                'invalid_email', 'Некорректный формат почты')
+                'invalid_email', 'Email обязателен')
             return render_template('login.html', login_form=login_form, reg_form=reg_form,
                                    error=error, active_tab=active_tab)
 
         db_sess = db_session.create_session()
 
-        if email and db_sess.query(UserModel).filter(UserModel.email == email).first():
+        if db_sess.query(UserModel).filter(UserModel.email == email).first():
             error = TRANSLATIONS.get(session.get('lang', 'ru'), {}).get(
                 'email_taken', 'Почта уже зарегистрирована')
-            db_sess.close()
-            return render_template('login.html', login_form=login_form, reg_form=reg_form,
-                                   error=error, active_tab=active_tab)
-
-        if db_sess.query(UserModel).filter(UserModel.username == username).first():
-            error = TRANSLATIONS.get(session.get('lang', 'ru'), {}).get(
-                'username_taken', 'Логин уже занят')
             db_sess.close()
             return render_template('login.html', login_form=login_form, reg_form=reg_form,
                                    error=error, active_tab=active_tab)
@@ -191,7 +175,7 @@ def login():
         user = UserModel(
             username=username,
             name=request.form.get('name', ''),
-            email=email if role == 'user' else None,
+            email=email,
             about=request.form.get('about', ''),
             role=role,
             inn=request.form.get('inn') if role == 'band' else None,
@@ -288,26 +272,35 @@ def search():
     query = request.args.get('q', '')
     db_sess = db_session.create_session()
     if query:
-        bands = db_sess.query(UserModel).filter(
+        pages = db_sess.query(BandPageModel).join(
+            UserModel, BandPageModel.band_id == UserModel.id
+        ).filter(
             UserModel.role == 'band',
             UserModel.status == 'active',
-            UserModel.name.contains(query)
+            sqlalchemy.or_(
+                BandPageModel.title.contains(query),
+                UserModel.name.contains(query)
+            )
         ).all()
     else:
-        bands = db_sess.query(UserModel).filter(
+        pages = db_sess.query(BandPageModel).join(
+            UserModel, BandPageModel.band_id == UserModel.id
+        ).filter(
             UserModel.role == 'band',
             UserModel.status == 'active'
         ).all()
     db_sess.close()
-    return render_template('search.html', bands=bands, query=query)
+    return render_template('search.html', bands=pages, query=query)
 
 
 @app.route('/band_page/create', methods=['GET', 'POST'])
 def create_band_page():
     if 'user_id' not in session or session.get('role') != 'band':
-        return redirect(url_for('login'))
+        flash(txt.get('login_to_search', 'Войдите как группа'), 'warning')
+        return redirect(url_for('index'))
 
     if session.get('status') == 'pending':
+        flash(txt.get('pending_message', 'Аккаунт на проверке'), 'warning')
         return redirect(url_for('index'))
 
     db_sess = db_session.create_session()
@@ -351,9 +344,10 @@ def create_band_page():
 
         db_sess.add(band_page)
         db_sess.commit()
+        page_id = band_page.id
         db_sess.close()
 
-        return redirect(url_for('view_band_page', page_id=band_page.id))
+        return redirect(url_for('view_band_page', page_id=page_id))
 
     db_sess.close()
     return render_template('create_band_page.html')
@@ -362,7 +356,8 @@ def create_band_page():
 @app.route('/band_page/<int:page_id>/edit', methods=['GET', 'POST'])
 def edit_band_page(page_id):
     if 'user_id' not in session or session.get('role') != 'band':
-        return redirect(url_for('login'))
+        flash(txt.get('login_to_search', 'Войдите как группу'), 'warning')
+        return redirect(url_for('index'))
 
     db_sess = db_session.create_session()
     band_page = db_sess.query(BandPageModel).filter(

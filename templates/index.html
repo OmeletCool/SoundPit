@@ -45,7 +45,7 @@ searchInput.addEventListener('input', function() {
     clearTimeout(debounceTimer);
     const query = this.value.trim();
     
-    if (query.length === 0) {
+    if (query.length < 2) {
         suggestionsBox.innerHTML = '';
         suggestionsBox.style.display = 'none';
         return;
@@ -77,8 +77,8 @@ function displaySuggestions(bands) {
     let html = '';
     bands.forEach(band => {
         html += `
-            <div class="suggestion-item" onclick="selectBand('${band.name}')">
-                <strong>${highlightMatch(band.name, searchInput.value)}</strong>
+            <div class="suggestion-item" onclick="selectBand('${band.page_id}')">
+                <strong>${highlightMatch(band.title, searchInput.value)}</strong>
                 <small class="text-white-50 d-block">@${band.username}</small>
             </div>
         `;
@@ -89,15 +89,13 @@ function displaySuggestions(bands) {
 }
 
 function highlightMatch(text, query) {
+    if (!query) return text;
     const regex = new RegExp(`(${query})`, 'gi');
     return text.replace(regex, '<span style="color: #9d4edd;">$1</span>');
 }
 
-function selectBand(bandName) {
-    searchInput.value = bandName;
-    suggestionsBox.innerHTML = '';
-    suggestionsBox.style.display = 'none';
-    document.getElementById('searchForm').submit();
+function selectBand(pageId) {
+    window.location.href = `/band_page/${pageId}`;
 }
 
 document.addEventListener('click', function(e) {
@@ -108,7 +106,7 @@ document.addEventListener('click', function(e) {
 });
 
 searchInput.addEventListener('focus', function() {
-    if (this.value.trim().length > 0 && suggestionsBox.children.length > 0) {
+    if (this.value.trim().length >= 2 && suggestionsBox.children.length > 0) {
         suggestionsBox.style.display = 'block';
     }
 });

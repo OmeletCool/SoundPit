@@ -11,40 +11,49 @@
 <body>
     <nav class="navbar navbar-expand-lg">
         <div class="container-fluid navbar-container">
+            <!-- ЛЕВЫЙ КРАЙ: Язык -->
             <div class="navbar-left">
+                <div class="lang-dropdown">
+                    <button class="btn-lang dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                        {{ current_lang|upper }}
+                    </button>
+                    <ul class="dropdown-menu">
+                        {% for l in ['ru', 'en', 'sq'] %}
+                        <li>
+                            <a class="dropdown-item" href="{{ url_for('set_lang', lang=l) }}">{{ l|upper }}</a>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- ЦЕНТР: Логотип -->
+            <div class="navbar-center">
                 <a class="navbar-brand" href="{{ url_for('index') }}">SOUNDHOLE</a>
             </div>
+
+            <!-- ПРАВЫЙ КРАЙ: Меню пользователя -->
             <div class="navbar-right">
-                <div class="nav-items">
-                    <div class="lang-dropdown" style="position: relative; display: inline-block;">
-                        <button class="btn-lang dropdown-toggle" type="button" data-bs-toggle="dropdown" style="background: transparent; border: 1px solid rgba(255,255,255,0.3); color: #e0d7f2; padding: 5px 15px; border-radius: 8px;">
-                            {{ current_lang|upper }}
-                        </button>
-                        <ul class="dropdown-menu" style="position: absolute; top: 100%; right: 0; left: auto; min-width: 80px; margin-top: 5px; background: #1a1a1a; border: 1px solid rgba(157, 78, 221, 0.3);">
-                            {% for l in ['ru', 'en', 'sq'] %}
-                            <li>
-                                <a class="dropdown-item" href="{{ url_for('set_lang', lang=l) }}" style="color: #e0d7f2; padding: 8px 15px; display: block;">{{ l|upper }}</a>
-                            </li>
-                            {% endfor %}
-                        </ul>
-                    </div>
-                    
+                <div class="nav-items user-group">
                     {% if session.get('role') == 'admin' %}
                     <a class="nav-link admin-link" href="{{ url_for('developers') }}">{{ txt.admin_panel }}</a>
                     {% endif %}
                     
                     {% if session.get('user_id') %}
-                    <a class="nav-link profile-link" href="{{ url_for('account') }}">
-                        {{ session['display_name'] }}
-                        {% if session.get('role') == 'band' %}
-                            {% if session.get('status') == 'pending' %}
-                            <span class="status-badge pending">⏳ {{ txt.pending }}</span>
-                            {% else %}
-                            <span class="status-badge certified">✓ {{ txt.certified }}</span>
+                    <!-- Группа: Имя + Выход -->
+                    <div class="user-actions">
+                        <a class="nav-link profile-link" href="{{ url_for('account') }}">
+                            {{ session['display_name'] }}
+                            {% if session.get('role') == 'band' %}
+                                {% if session.get('status') == 'pending' %}
+                                <span class="status-badge pending">⏳ {{ txt.pending }}</span>
+                                {% else %}
+                                <span class="status-badge certified">✓ {{ txt.certified }}</span>
+                                {% endif %}
                             {% endif %}
-                        {% endif %}
-                    </a>
-                    <a class="nav-link logout-link" href="{{ url_for('logout') }}">✕ {{ txt.logout }}</a>
+                        </a>
+                        <a class="nav-link logout-link" href="{{ url_for('logout') }}">✕ {{ txt.logout }}</a>
+                    </div>
                     {% else %}
                     <a class="nav-link login-link" href="{{ url_for('login') }}">{{ txt.login }}</a>
                     {% endif %}
