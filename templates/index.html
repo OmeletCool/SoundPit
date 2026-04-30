@@ -2,17 +2,15 @@
 {% block content %}
 <div class="container">
     <div class="row justify-content-center">
-        <div class="col-12"> 
+        <div class="col-12">
             <div class="custom-card card-home">
                 {% if session.get('user_id') and session.get('role') == 'band' %}
                 <div class="text-end mb-3">
                     {% if show_pending %}
                     <button class="btn-back" id="pending-btn" onclick="togglePendingMessage()">✏️</button>
-                    <div id="pending-message" class="alert alert-warning mt-2 d-none">
-                        ⚠️ {{ txt.pending_message }}
-                    </div>
+                    <div id="pending-message" class="alert alert-warning mt-2 d-none">⚠️ {{ txt.pending_message }}</div>
                     {% elif band_page %}
-                    <a href="/band_page/{{ band_page.id }}/edit" class="btn-back">✏️ {{ txt.edit_page }}</a>
+                    <a href="/band_page/{{ band_page.id }}/edit" class="btn-back">️ {{ txt.edit_page }}</a>
                     <a href="/band_page/{{ band_page.id }}" class="btn-back ms-2">📄 {{ txt.my_page }}</a>
                     {% else %}
                     <a href="/band_page/create" class="btn-back">➕ {{ txt.create_page }}</a>
@@ -24,13 +22,55 @@
                     <input type="text" name="q" class="input" id="searchInput" placeholder="{{ txt.search_place }}" value="{{ request.args.get('q', '') }}" autocomplete="off">
                     <div class="suggestions-box" id="suggestionsBox"></div>
                     <button type="submit" class="btn-search">{{ txt.send }}</button>
-                    
-                    {% if not session.get('user_id') %}
-                    <div class="text-center mt-3 text-white-50">
-                        {{ txt.platform_desc }}
-                    </div>
-                    {% endif %}
                 </form>
+            </div>
+
+            <!-- 🔄 ДВА РЕЙТИНГА РЯДОМ -->
+            <div class="ratings-row">
+                <!-- ЛЕВЫЙ: ТОП ПО РЕЙТИНГУ -->
+                <div class="rating-column">
+                    <h2 class="rating-title">🏆 ТОП ПО РЕЙТИНГУ</h2>
+                    {% if top_bands %}
+                    <div class="compact-list">
+                        {% for band in top_bands %}
+                        <a href="/band_page/{{ band.page_id }}" class="compact-item">
+                            {% if band.cover_image %}
+                            <img src="{{ band.cover_image }}" alt="{{ band.title }}" class="compact-cover">
+                            {% else %}
+                            <div class="compact-cover-placeholder">🎵</div>
+                            {% endif %}
+                            <div class="compact-info">
+                                <span class="compact-name">{{ band.title }}</span>
+                                <span class="compact-rating">⭐ {{ band.rating }} <small class="text-white-50">({{ band.votes }})</small></span>
+                            </div>
+                        </a>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p class="text-white-50 text-center">Пока нет оценок</p>
+                    {% endif %}
+                </div>
+
+                <!-- ПРАВЫЙ: НОВИНКИ / HOT -->
+                <div class="rating-column">
+                    <h2 class="rating-title">🔥 НОВИНКИ / HOT</h2>
+                    {% if hot_bands %}
+                    <div class="compact-list">
+                        {% for band in hot_bands %}
+                        <a href="/band_page/{{ band.page_id }}" class="compact-item">
+                            {% if band.cover_image %}
+                            <img src="{{ band.cover_image }}" alt="{{ band.title }}" class="compact-cover">
+                            {% else %}
+                            <div class="compact-cover-placeholder">🎵</div>
+                            {% endif %}
+                            <span class="compact-name">{{ band.title }}</span>
+                        </a>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p class="text-white-50 text-center">Новых групп пока нет</p>
+                    {% endif %}
+                </div>
             </div>
         </div>
     </div>
@@ -44,59 +84,43 @@ let debounceTimer;
 searchInput.addEventListener('input', function() {
     clearTimeout(debounceTimer);
     const query = this.value.trim();
-    
     if (query.length < 2) {
         suggestionsBox.innerHTML = '';
         suggestionsBox.style.display = 'none';
         return;
     }
-    
-    debounceTimer = setTimeout(() => {
-        fetchSuggestions(query);
-    }, 300);
+    debounceTimer = setTimeout(() => fetchSuggestions(query), 300);
 });
 
 async function fetchSuggestions(query) {
     try {
         const response = await fetch(`/api/search_bands?q=${encodeURIComponent(query)}`);
         const bands = await response.json();
-        
         displaySuggestions(bands);
-    } catch (error) {
-        console.error('Error fetching suggestions:', error);
-    }
+    } catch (error) { console.error('Error:', error); }
 }
 
 function displaySuggestions(bands) {
     if (bands.length === 0) {
         suggestionsBox.innerHTML = '<div class="suggestion-item text-white-50">{{ txt.no_results }}</div>';
-        suggestionsBox.style.display = 'block';
-        return;
+        suggestionsBox.style.display = 'block'; return;
     }
-    
     let html = '';
     bands.forEach(band => {
-        html += `
-            <div class="suggestion-item" onclick="selectBand('${band.page_id}')">
-                <strong>${highlightMatch(band.title, searchInput.value)}</strong>
-                <small class="text-white-50 d-block">@${band.username}</small>
-            </div>
-        `;
+        html += `<div class="suggestion-item" onclick="selectBand('${band.page_id}')">
+            <strong>${highlightMatch(band.title, searchInput.value)}</strong>
+            <small class="text-white-50 d-block">@${band.username}</small></div>`;
     });
-    
     suggestionsBox.innerHTML = html;
     suggestionsBox.style.display = 'block';
 }
 
 function highlightMatch(text, query) {
     if (!query) return text;
-    const regex = new RegExp(`(${query})`, 'gi');
-    return text.replace(regex, '<span style="color: #9d4edd;">$1</span>');
+    return text.replace(new RegExp(`(${query})`, 'gi'), '<span style="color: #9d4edd;">$1</span>');
 }
 
-function selectBand(pageId) {
-    window.location.href = `/band_page/${pageId}`;
-}
+function selectBand(pageId) { window.location.href = `/band_page/${pageId}`; }
 
 document.addEventListener('click', function(e) {
     if (!e.target.closest('.search-container')) {
@@ -106,16 +130,12 @@ document.addEventListener('click', function(e) {
 });
 
 searchInput.addEventListener('focus', function() {
-    if (this.value.trim().length >= 2 && suggestionsBox.children.length > 0) {
-        suggestionsBox.style.display = 'block';
-    }
+    if (this.value.trim().length >= 2 && suggestionsBox.children.length > 0) suggestionsBox.style.display = 'block';
 });
 
 function togglePendingMessage() {
     const msg = document.getElementById('pending-message');
-    if (msg) {
-        msg.classList.toggle('d-none');
-    }
+    if (msg) msg.classList.toggle('d-none');
 }
 </script>
 {% endblock %}

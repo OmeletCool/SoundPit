@@ -10,6 +10,8 @@ from backend.database.models.users_model import UserModel
 from backend.database.models.band_page_model import BandPageModel
 from backend.database.default_data import default_data
 from backend.forms.user_forms import LoginForm, RegisterForm
+from backend.database.models.user_rating_model import UserRating
+
 
 app = Flask(__name__)
 app.secret_key = 'super_secret_neon_key_2026'
@@ -37,6 +39,47 @@ def inject_vars():
 def index():
     band_page = None
     show_pending = False
+    
+    db_sess = db_session.create_session()
+    
+    # 🏆 Левый: ТОП по рейтингу
+    top_rated = db_sess.query(BandPageModel).join(
+        UserModel, BandPageModel.band_id == UserModel.id
+    ).filter(
+        UserModel.role == 'band',
+        UserModel.status == 'active',
+        BandPageModel.is_published == True,
+        BandPageModel.votes > 0
+    ).order_by(BandPageModel.rating.desc()).limit(5).all()
+    
+    # 🔥 Правый: Новинки
+    hot_bands = db_sess.query(BandPageModel).join(
+        UserModel, BandPageModel.band_id == UserModel.id
+    ).filter(
+        UserModel.role == 'band',
+        UserModel.status == 'active',
+        BandPageModel.is_published == True
+    ).order_by(BandPageModel.created_date.desc()).limit(5).all()
+    
+    # Формируем данные (только левый получает рейтинг)
+    top_data = [
+        {
+            'page_id': b.id,
+            'title': b.title or b.band.name,
+            'cover_image': b.cover_image,
+            'rating': round(b.rating, 1),
+            'votes': b.votes
+        } for b in top_rated
+    ]
+    hot_data = [
+        {
+            'page_id': b.id,
+            'title': b.title or b.band.name,
+            'cover_image': b.cover_image
+        } for b in hot_bands
+    ]
+    db_sess.close()
+    
     if 'user_id' in session and session.get('role') == 'band':
         db_sess = db_session.create_session()
         user = db_sess.query(UserModel).filter(UserModel.id == session['user_id']).first()
@@ -46,7 +89,12 @@ def index():
             else:
                 band_page = db_sess.query(BandPageModel).filter(BandPageModel.band_id == user.id).first()
         db_sess.close()
-    return render_template('index.html', band_page=band_page, show_pending=show_pending)
+    
+    return render_template('index.html', 
+                          band_page=band_page, 
+                          show_pending=show_pending,
+                          top_bands=top_data,
+                          hot_bands=hot_data)
 
 
 @app.route('/set_lang/<lang>')
@@ -58,6 +106,7 @@ def set_lang(lang):
 
 @app.route('/api/search_bands')
 def api_search_bands():
+    """Поиск групп — только те, у которых есть созданная страница"""
     query = request.args.get('q', '').strip()
     db_sess = db_session.create_session()
     
@@ -65,75 +114,89 @@ def api_search_bands():
         db_sess.close()
         return json.dumps([], ensure_ascii=False)
     
-    results = []
-    seen_ids = set()
-    
     try:
+        # 🔍 Ищем ТОЛЬКО по BandPageModel (только группы со страницей)
         pages = db_sess.query(BandPageModel).join(
             UserModel, BandPageModel.band_id == UserModel.id
         ).filter(
             UserModel.role == 'band',
             UserModel.status == 'active',
+            BandPageModel.is_published == True,  # Только опубликованные
             sqlalchemy.or_(
                 sqlalchemy.func.lower(BandPageModel.title).contains(query),
                 sqlalchemy.func.lower(UserModel.name).contains(query)
             )
         ).limit(10).all()
         
-        for page in pages:
-            results.append({
+        result = [
+            {
                 'page_id': page.id,
                 'title': page.title or page.band.name,
                 'username': page.band.username
-            })
-            seen_ids.add(page.band_id)
+            }
+            for page in pages
+        ]
     except Exception as e:
-        print(f"Search pages error: {e}")
-    
-    if len(results) < 10:
-        try:
-            users = db_sess.query(UserModel).filter(
-                UserModel.role == 'band',
-                UserModel.status == 'active',
-                UserModel.id.notin_(seen_ids),
-                sqlalchemy.func.lower(UserModel.name).contains(query)
-            ).limit(10 - len(results)).all()
-            
-            for user in users:
-                results.append({
-                    'page_id': None,
-                    'title': user.name,
-                    'username': user.username
-                })
-        except Exception as e:
-            print(f"Search users error: {e}")
+        print(f"Search error: {e}")
+        result = []
     
     db_sess.close()
-    return json.dumps(results, ensure_ascii=False)
+    return json.dumps(result, ensure_ascii=False)
 
 
 @app.route('/api/rate_band/<int:page_id>', methods=['POST'])
 def rate_band(page_id):
     if 'user_id' not in session:
         return jsonify({'error': 'Нужно войти'}), 401
+    
     data = request.get_json()
     score = data.get('score')
+    
     if not score or score < 1 or score > 5:
         return jsonify({'error': 'Некорректная оценка'}), 400
 
     db_sess = db_session.create_session()
     band_page = db_sess.query(BandPageModel).filter(BandPageModel.id == page_id).first()
     
-    if band_page:
-        current_sum = band_page.rating * band_page.votes
-        new_sum = current_sum + score
-        band_page.votes += 1
-        band_page.rating = new_sum / band_page.votes
-        db_sess.commit()
-        result = {'new_rating': round(band_page.rating, 1), 'votes': band_page.votes}
+    if not band_page:
+        db_sess.close()
+        return jsonify({'error': 'Страница не найдена'}), 404
+
+    # 🔍 Проверяем, ставил ли уже этот пользователь оценку
+    existing_rating = db_sess.query(UserRating).filter(
+        UserRating.user_id == session['user_id'],
+        UserRating.band_page_id == page_id
+    ).first()
+
+    if existing_rating:
+        # ✅ Обновляем существующую оценку
+        existing_rating.score = score
     else:
-        result = {'error': 'Страница не найдена'}
+        # ➕ Создаём новую оценку
+        new_vote = UserRating(
+            user_id=session['user_id'],
+            band_page_id=page_id,
+            score=score
+        )
+        db_sess.add(new_vote)
+
+    # 🔄 Пересчитываем средний рейтинг страницы
+    all_scores = db_sess.query(UserRating.score).filter(
+        UserRating.band_page_id == page_id
+    ).all()
+    scores_list = [s[0] for s in all_scores]
+    
+    if scores_list:
+        band_page.rating = sum(scores_list) / len(scores_list)
+        band_page.votes = len(scores_list)
+    else:
+        band_page.rating = 0
+        band_page.votes = 0
+
+    db_sess.commit()
+    result = {'new_rating': round(band_page.rating, 1), 'votes': band_page.votes}
     db_sess.close()
+    
     return jsonify(result)
 
 

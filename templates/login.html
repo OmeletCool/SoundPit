@@ -5,10 +5,10 @@
         <div class="col-md-6">
             <div class="custom-card card-auth">
                 {% if warning_message %}
-                <div class="alert alert-warning text-center">⚠️ {{ warning_message }}</div>
+                <div class="alert alert-warning text-center">{{ warning_message }}</div>
                 {% endif %}
                 {% if error %}
-                <div class="alert alert-danger text-center">⚠️ {{ error }}</div>
+                <div class="alert alert-danger text-center">{{ error }}</div>
                 {% endif %}
                 
                 <div class="role-tabs mb-4">
@@ -71,7 +71,7 @@
                         
                         <div id="band-fields" class="d-none">
                             <div class="upload-box mb-3">
-                                <label class="text-white-50 d-block mb-2">📋 {{ txt.documents }}</label>
+                                <label class="text-white-50 d-block mb-2">{{ txt.documents }}</label>
                                 <small class="text-white-50 d-block mb-2">{{ txt.docs_hint }}</small>
                                 {{ reg_form.documents(class="form-control") }}
                             </div>
