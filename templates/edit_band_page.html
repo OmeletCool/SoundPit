@@ -4,40 +4,70 @@
     <div class="row justify-content-center">
         <div class="col-md-8">
             <div class="custom-card">
-                <h2 class="page-title text-center mb-4">{{ txt.edit_page }}</h2>
+                <h2 class="gradient-title text-center mb-4">{{ txt.edit_page }}</h2>
                 
-                <form method="POST" enctype="multipart/form-data">
+                <form method="POST" action="{{ url_for('edit_band_page', page_id=band_page.id) }}" enctype="multipart/form-data">
                     <div class="mb-3">
                         <label class="text-white-50">{{ txt.band_name }}</label>
-                        <input type="text" name="title" class="input" value="{{ band_page.title or '' }}" placeholder="{{ txt.band_name }}">
+                        <input type="text" name="title" class="input" value="{{ band_page.title or '' }}" required>
                     </div>
                     
                     <div class="mb-3">
                         <label class="text-white-50">{{ txt.about_band }}</label>
-                        <textarea name="description" class="input" rows="3" placeholder="{{ txt.about_band }}">{{ band_page.description or '' }}</textarea>
+                        <textarea name="description" class="input" rows="3">{{ band_page.description or '' }}</textarea>
                     </div>
                     
                     <div class="mb-3">
                         <label class="text-white-50">{{ txt.content }}</label>
-                        <textarea name="content" class="input" rows="10" placeholder="{{ txt.content_placeholder }}">{{ band_page.content or '' }}</textarea>
+                        <textarea name="content" class="input" rows="5">{{ band_page.content or '' }}</textarea>
                     </div>
                     
                     <div class="mb-3">
                         <label class="text-white-50">{{ txt.cover_image }}</label>
-                        {% if band_page.cover_image %}
-                        <div class="mb-2">
-                            <img src="{{ band_page.cover_image }}" alt="{{ txt.cover_image }}" class="img-fluid" style="max-height: 200px; border-radius: 10px;">
+                        <div class="upload-box text-center">
+                            <input type="file" name="cover_image" class="form-control" accept="image/png, image/jpeg, image/webp">
+                            {% if band_page.cover_image %}
+                            <img src="{{ band_page.cover_image }}" alt="Current cover" class="img-fluid mt-2" style="max-height: 150px; border-radius: 10px;">
+                            {% endif %}
                         </div>
-                        {% endif %}
-                        <input type="file" name="cover_image" class="form-control" accept="image/*" style="background: #1a1a1a; color: white; border: 1px solid rgba(255,255,255,0.2);">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="text-white-50">{{ txt.tracks }} (up to 3)</label>
+                        {% for i in range(1, 4) %}
+                        <div class="upload-box mb-2">
+                            <div class="row align-items-center">
+                                <div class="col-md-7">
+                                    <input type="file" name="track{{ i }}" class="form-control" accept=".mp3,.wav,.ogg,.flac,.m4a">
+                                    {% if band_page['track' ~ i ~ '_path'] %}
+                                    <small class="text-white-50 d-block mt-1">🎵 {{ band_page['track' ~ i ~ '_name'] or 'Track ' ~ i }}</small>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-5">
+                                    <input type="text" name="track{{ i }}_name" class="input" placeholder="{{ txt.track_name_placeholder }}" value="{{ band_page['track' ~ i ~ '_name'] or '' }}">
+                                </div>
+                            </div>
+                            <small class="text-white-50">{{ txt.upload_audio_hint }}</small>
+                        </div>
+                        {% endfor %}
                     </div>
                     
-                    <div class="d-grid gap-2">
-                        <button type="submit" class="btn-search">{{ txt.save_changes }}</button>
-                        <a href="{{ url_for('view_band_page', page_id=band_page.id) }}" class="btn-back text-center">{{ txt.my_page }}</a>
-                        <a href="{{ url_for('index') }}" class="btn-back text-center">{{ txt.back }}</a>
+                    <div class="d-grid">
+                        <button type="submit" class="btn-reg">{{ txt.save_changes }}</button>
                     </div>
                 </form>
+                
+                <div class="text-center mt-4 pt-3" style="border-top: 1px solid rgba(255,255,255,0.1);">
+                    <a href="{{ url_for('delete_band_page', page_id=band_page.id) }}" 
+                       class="btn-back" 
+                       style="background: rgba(220, 53, 69, 0.15); border-color: #dc3545; color: #dc3545;" 
+                       onclick="return confirm('Вы уверены, что хотите удалить страничку? Это действие нельзя отменить.')">
+                       🗑️ {{ txt.delete_page or 'Удалить страницу' }}
+                    </a>
+                    
+                    <a href="{{ url_for('view_band_page', page_id=band_page.id) }}" class="btn-back me-2">{{ txt.my_page }}</a>
+                    <a href="{{ url_for('index') }}" class="btn-back">{{ txt.back }}</a>
+                </div>
             </div>
         </div>
     </div>

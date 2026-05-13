@@ -4,89 +4,78 @@
     <div class="row justify-content-center">
         <div class="col-md-6">
             <div class="custom-card card-auth">
-                {% if warning_message %}
-                <div class="alert alert-warning text-center">{{ warning_message }}</div>
-                {% endif %}
                 {% if error %}
                 <div class="alert alert-danger text-center">{{ error }}</div>
                 {% endif %}
-                
-                <div class="role-tabs mb-4">
-                    <button class="role-btn active" onclick="switchTab('login')">{{ txt.login }}</button>
-                    <button class="role-btn" onclick="switchTab('register')">{{ txt.reg }}</button>
+
+                <div class="role-tabs">
+                    <button class="role-btn active" id="tab-login" onclick="switchTab('login')" type="button">{{ txt.login }}</button>
+                    <button class="role-btn" id="tab-register" onclick="switchTab('register')" type="button">{{ txt.reg }}</button>
                 </div>
-                
-                <div id="login-tab" class="{% if active_tab != 'register' %}d-block{% else %}d-none{% endif %}">
-                    <form method="POST" action="{{ url_for('login') }}">
+
+                <div id="login-tab" class="d-block">
+                    <form method="POST" id="loginForm">
                         {{ login_form.hidden_tag() }}
                         <div class="mb-3">
-                            {{ login_form.username(class="input", placeholder=txt.enter_login) }}
+                            {{ login_form.username(class="input", placeholder=txt.enter_login, id='login_username') }}
                         </div>
                         <div class="mb-3">
-                            {{ login_form.password(class="input", placeholder=txt.enter_password) }}
+                            {{ login_form.password(class="input", placeholder=txt.enter_password, id='login_password') }}
                         </div>
                         <div class="d-grid">
                             <button type="submit" name="submit_login" class="btn-search">{{ txt.submit_login }}</button>
                         </div>
                     </form>
                 </div>
-                
-                <div id="register-tab" class="{% if active_tab == 'register' %}d-block{% else %}d-none{% endif %}">
-                    <form method="POST" action="{{ url_for('login') }}" enctype="multipart/form-data">
+
+                <div id="register-tab" class="d-none">
+                    <form method="POST" enctype="multipart/form-data" id="registerForm">
                         {{ reg_form.hidden_tag() }}
                         
-                        <div class="mb-3">
-                            <label class="text-white-50">{{ txt.account_type }}</label>
-                            <div class="role-selector">
-                                <label class="role-radio">
-                                    <input type="radio" name="role" value="user" checked onchange="toggleBandFields(false)">
-                                    {{ txt.listener }}
-                                </label>
-                                <label class="role-radio">
-                                    <input type="radio" name="role" value="band" onchange="toggleBandFields(true)">
-                                    {{ txt.band }}
-                                </label>
-                            </div>
+                        <div class="role-selector">
+                            <label class="role-radio">
+                                <input type="radio" name="role" value="user" checked onchange="toggleBandFields(false)">
+                                {{ txt.listener }}
+                            </label>
+                            <label class="role-radio">
+                                <input type="radio" name="role" value="band" onchange="toggleBandFields(true)">
+                                {{ txt.band }}
+                            </label>
                         </div>
-                        
+
                         <div class="mb-3">
-                            {{ reg_form.username(class="input", placeholder=txt.create_login) }}
+                            {{ reg_form.username(class="input", placeholder=txt.create_login, id='reg_username') }}
                         </div>
-                        
                         <div class="mb-3">
-                            {{ reg_form.name(class="input", placeholder=txt.your_name) }}
+                            {{ reg_form.name(class="input", placeholder=txt.your_name, id='reg_name') }}
                         </div>
-                        
                         <div class="mb-3">
-                            {{ reg_form.email(class="input", placeholder=txt.email) }}
+                            {{ reg_form.email(class="input", placeholder=txt.email, id='reg_email') }}
                         </div>
-                        
                         <div class="mb-3">
-                            {{ reg_form.password(class="input", placeholder=txt.password) }}
+                            {{ reg_form.password(class="input", placeholder=txt.password, id='reg_password') }}
                         </div>
-                        
                         <div class="mb-3">
-                            {{ reg_form.password_again(class="input", placeholder=txt.repeat_password) }}
+                            {{ reg_form.password_again(class="input", placeholder=txt.repeat_password, id='reg_password_again') }}
                         </div>
-                        
                         <div class="mb-3">
-                            {{ reg_form.about(class="input", placeholder=txt.about, rows=3) }}
+                            {{ reg_form.about(class="input", placeholder=txt.about, rows=3, id='reg_about') }}
                         </div>
-                        
+
                         <div id="band-fields" class="d-none">
                             <div class="upload-box mb-3">
                                 <label class="text-white-50 d-block mb-2">{{ txt.documents }}</label>
                                 <small class="text-white-50 d-block mb-2">{{ txt.docs_hint }}</small>
-                                {{ reg_form.documents(class="form-control") }}
+                                <input type="file" name="documents" id="documents" class="form-control" accept=".txt,.pdf,.docx,.doc,.png,.jpg,.jpeg,.gif,.bmp,.webp,.svg,.zip,.rar,.7z,.tar,.gz">
                             </div>
                             <div class="mb-3">
-                                <input type="text" name="inn" class="input" placeholder="{{ txt.inn }}">
+                                <input type="text" name="inn" class="input" placeholder="{{ txt.inn }}" id="inn">
                             </div>
                             <div class="mb-3">
-                                <input type="text" name="rkn_number" class="input" placeholder="{{ txt.rkn }}">
+                                <input type="text" name="rkn_number" class="input" placeholder="{{ txt.rkn }}" id="rkn">
                             </div>
                         </div>
-                        
+
                         <div class="d-grid">
                             <button type="submit" name="submit_register" class="btn-reg">{{ txt.create_account }}</button>
                         </div>
@@ -98,42 +87,166 @@
 </div>
 
 <script>
+const txt = {
+    fieldRequired: "{{ txt.field_required }}",
+    invalidLoginLength: "{{ txt.invalid_login_length }}",
+    invalidEmail: "{{ txt.invalid_email }}",
+    passwordsMismatch: "{{ txt.passwords_mismatch }}",
+    passwordLength: "{{ txt.password_length }}"
+};
+
+function scrollToAlert() {
+    const alert = document.getElementById('alert-container').firstElementChild || document.getElementById('server-alert');
+    if (alert) {
+        alert.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+}
+
+function showStyledAlert(message, type = 'danger') {
+    const container = document.getElementById('alert-container');
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `alert alert-${type} text-center mb-3`;
+    alertDiv.style.animation = 'slideIn 0.3s ease';
+    alertDiv.textContent = message;
+    
+    container.innerHTML = '';
+    container.appendChild(alertDiv);
+    
+    scrollToAlert();
+    
+    setTimeout(() => {
+        alertDiv.style.animation = 'slideOut 0.3s ease';
+        setTimeout(() => {
+            alertDiv.remove();
+        }, 300);
+    }, 5000);
+}
+
 function switchTab(tab) {
     const loginTab = document.getElementById('login-tab');
     const registerTab = document.getElementById('register-tab');
-    const btns = document.querySelectorAll('.role-btn');
-    
+    const tabLogin = document.getElementById('tab-login');
+    const tabRegister = document.getElementById('tab-register');
     if (tab === 'login') {
         loginTab.classList.remove('d-none');
         loginTab.classList.add('d-block');
         registerTab.classList.add('d-none');
         registerTab.classList.remove('d-block');
-        btns[0].classList.add('active');
-        btns[1].classList.remove('active');
+        tabLogin.classList.add('active');
+        tabRegister.classList.remove('active');
     } else {
         loginTab.classList.add('d-none');
         loginTab.classList.remove('d-block');
         registerTab.classList.remove('d-none');
         registerTab.classList.add('d-block');
-        btns[0].classList.remove('active');
-        btns[1].classList.add('active');
+        tabLogin.classList.remove('active');
+        tabRegister.classList.add('active');
     }
+    sessionStorage.setItem('auth_tab', tab);
 }
 
 function toggleBandFields(show) {
     const bandFields = document.getElementById('band-fields');
-    const aboutField = document.getElementById('about-field');
-    const nameField = document.getElementById('name-field');
-    
-    if (show) {
-        bandFields.classList.remove('d-none');
-        aboutField.placeholder = "{{ txt.about_band }}";
-        nameField.placeholder = "{{ txt.band_name }}";
-    } else {
-        bandFields.classList.add('d-none');
-        aboutField.placeholder = "{{ txt.about }}";
-        nameField.placeholder = "{{ txt.your_name }}";
+    if (show) bandFields.classList.remove('d-none');
+    else bandFields.classList.add('d-none');
+}
+
+function saveFormData() {
+    const data = {
+        username: document.getElementById('reg_username')?.value || '',
+        name: document.getElementById('reg_name')?.value || '',
+        email: document.getElementById('reg_email')?.value || '',
+        about: document.getElementById('reg_about')?.value || '',
+        inn: document.getElementById('inn')?.value || '',
+        rkn: document.getElementById('rkn')?.value || '',
+        role: document.querySelector('input[name="role"]:checked')?.value || 'user'
+    };
+    sessionStorage.setItem('reg_form_data', JSON.stringify(data));
+}
+
+function restoreFormData() {
+    const saved = sessionStorage.getItem('reg_form_data');
+    if (saved) {
+        const data = JSON.parse(saved);
+        if (document.getElementById('reg_username')) document.getElementById('reg_username').value = data.username;
+        if (document.getElementById('reg_name')) document.getElementById('reg_name').value = data.name;
+        if (document.getElementById('reg_email')) document.getElementById('reg_email').value = data.email;
+        if (document.getElementById('reg_about')) document.getElementById('reg_about').value = data.about;
+        if (document.getElementById('inn')) document.getElementById('inn').value = data.inn;
+        if (document.getElementById('rkn')) document.getElementById('rkn').value = data.rkn;
+        const roleRadio = document.querySelector(`input[name="role"][value="${data.role}"]`);
+        if (roleRadio) {
+            roleRadio.checked = true;
+            toggleBandFields(data.role === 'band');
+        }
     }
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+    const hasError = {{ 'true' if error else 'false' }};
+    const backendTab = '{{ active_tab }}';
+    if (hasError || backendTab === 'register') {
+        switchTab('register');
+        restoreFormData();
+        setTimeout(scrollToAlert, 100);
+    } else {
+        const savedTab = sessionStorage.getItem('auth_tab');
+        if (savedTab === 'register') {
+            switchTab('register');
+            restoreFormData();
+        } else {
+            switchTab('login');
+        }
+    }
+
+    const formInputs = ['reg_username', 'reg_name', 'reg_email', 'reg_about', 'inn', 'rkn'];
+    formInputs.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.addEventListener('input', saveFormData);
+    });
+    document.querySelectorAll('input[name="role"]').forEach(r => r.addEventListener('change', saveFormData));
+
+    const registerForm = document.getElementById('registerForm');
+    if (registerForm) {
+        registerForm.addEventListener('submit', function(e) {
+            const username = document.getElementById('reg_username');
+            const name = document.getElementById('reg_name');
+            const email = document.getElementById('reg_email');
+            const password = document.getElementById('reg_password');
+            const passwordAgain = document.getElementById('reg_password_again');
+            if (!username.value.trim()) { e.preventDefault(); showStyledAlert(txt.fieldRequired, 'danger'); username.focus(); return; }
+            if (username.value.length < 3) { e.preventDefault(); showStyledAlert(txt.invalidLoginLength, 'danger'); username.focus(); return; }
+            if (!name.value.trim()) { e.preventDefault(); showStyledAlert(txt.fieldRequired, 'danger'); name.focus(); return; }
+            if (!email.value.trim()) { e.preventDefault(); showStyledAlert(txt.fieldRequired, 'danger'); email.focus(); return; }
+            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)) { e.preventDefault(); showStyledAlert(txt.invalidEmail, 'danger'); email.focus(); return; }
+            if (!password.value) { e.preventDefault(); showStyledAlert(txt.fieldRequired, 'danger'); password.focus(); return; }
+            if (password.value.length < 6) { e.preventDefault(); showStyledAlert(txt.passwordLength, 'danger'); password.focus(); return; }
+            if (password.value !== passwordAgain.value) { e.preventDefault(); showStyledAlert(txt.passwordsMismatch, 'danger'); passwordAgain.focus(); return; }
+            sessionStorage.removeItem('reg_form_data');
+            sessionStorage.removeItem('auth_tab');
+        });
+    }
+
+    const loginForm = document.getElementById('loginForm');
+    if (loginForm) {
+        loginForm.addEventListener('submit', function(e) {
+            const username = document.getElementById('login_username');
+            const password = document.getElementById('login_password');
+            if (!username.value.trim()) { e.preventDefault(); showStyledAlert(txt.fieldRequired, 'danger'); username.focus(); return; }
+            if (!password.value) { e.preventDefault(); showStyledAlert(txt.fieldRequired, 'danger'); password.focus(); return; }
+        });
+    }
+});
 </script>
+
+<style>
+@keyframes slideIn {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+@keyframes slideOut {
+    from { opacity: 1; transform: translateY(0); }
+    to { opacity: 0; transform: translateY(-20px); }
+}
+</style>
 {% endblock %}

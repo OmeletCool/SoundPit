@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            
+            <!-- Поисковая строка -->
+            <div class="card-home">
+                <div class="search-container">
+                    <form action="{{ url_for('search') }}" method="GET" id="searchForm">
+                        <input type="text" name="q" id="searchInput" class="input" 
+                               placeholder="{{ txt.search_place }}" autocomplete="off"
+                               value="{{ query }}">
+                        <button type="submit" class="btn-search">{{ txt.send }}</button>
+                        <div id="suggestionsBox" class="suggestions-box"></div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Результаты поиска -->
+            <div class="custom-card" style="width: 100%; margin: 20px auto;">
+                {% if query %}
+                    <h3 class="page-title text-center mb-4">
+                        {% if bands %}
+                            {{ txt.top_bands_title }}: "{{ query }}"
+                        {% else %}
+                            {{ txt.no_results }}
+                        {% endif %}
+                    </h3>
+                    
+                    {% if bands %}
+                    <div class="compact-list">
+                        {% for band in bands %}
+                        <a href="{{ url_for('view_band_page', page_id=band.id) }}" class="compact-item">
+                            {% if band.cover_image %}
+                            <img src="{{ band.cover_image }}" alt="{{ band.title }}" class="compact-cover">
+                            {% else %}
+                            <div class="compact-cover-placeholder">🎵</div>
+                            {% endif %}
+                            
+                            <div class="compact-info">
+                                <span class="compact-name">{{ band.title or band.band.name }}</span>
+                                {% if band.rating > 0 %}
+                                <span class="compact-rating">★ {{ "%.1f"|format(band.rating) }} <small>({{ band.votes }})</small></span>
+                                {% endif %}
+                            </div>
+                        </a>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p class="text-center text-white-50">{{ txt.no_results }}</p>
+                    {% endif %}
+                {% else %}
+                    <p class="text-center text-white-50">{{ txt.search_place }}</p>
+                {% endif %}
+
+                <div class="text-center mt-4">
+                    <a href="{{ url_for('index') }}" class="btn-back">{{ txt.back }}</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const input = document.getElementById('searchInput');
+    const box = document.getElementById('suggestionsBox');
+    let debounceTimer;
+
+    input.addEventListener('input', function() {
+        clearTimeout(debounceTimer);
+        const query = this.value.trim();
+        if (query.length < 2) { box.innerHTML = ''; return; }
+        debounceTimer = setTimeout(() => {
+            fetch(`/api/search_bands?q=${encodeURIComponent(query)}`)
+                .then(r => r.json())
+                .then(data => {
+                    box.innerHTML = '';
+                    data.forEach(item => {
+                        const a = document.createElement('a');
+                        a.href = `/band_page/${item.page_id}`;
+                        a.className = 'suggestion-item';
+                        a.innerHTML = `<strong>${item.title}</strong><small>@${item.username}</small>`;
+                        box.appendChild(a);
+                    });
+                });
+        }, 300);
+    });
+
+    document.addEventListener('click', function(e) {
+        if (!box.contains(e.target) && e.target !== input) box.innerHTML = '';
+    });
+});
+</script>
+{% endblock %}

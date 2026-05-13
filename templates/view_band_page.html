@@ -2,53 +2,56 @@
 {% block content %}
 <div class="container mt-5">
     <div class="row justify-content-center">
-        <div class="col-md-10">
+        <div class="col-md-8">
             <div class="custom-card">
+                
                 {% if band_page.cover_image %}
-                <div class="text-center mb-4">
-                    <img src="{{ band_page.cover_image }}" alt="{{ band_page.title or band.name }}" class="img-fluid" style="border-radius: 20px; max-height: 400px; width: 100%; object-fit: cover;">
-                </div>
+                <img src="{{ band_page.cover_image }}" alt="{{ band_page.title or band.name }}" class="img-fluid mb-4" style="border-radius: 15px; max-height: 400px; object-fit: cover;">
                 {% endif %}
                 
                 <h1 class="gradient-title text-center mb-3">{{ band_page.title or band.name }}</h1>
                 
                 <div class="text-center mb-4">
                     <span class="status-badge certified">{{ txt.certified }}</span>
-                    <span class="rating-container ms-3">
-                        <span class="star" data-value="1" onclick="rateBand(1)">★</span>
-                        <span class="star" data-value="2" onclick="rateBand(2)">★</span>
-                        <span class="star" data-value="3" onclick="rateBand(3)">★</span>
-                        <span class="star" data-value="4" onclick="rateBand(4)">★</span>
-                        <span class="star" data-value="5" onclick="rateBand(5)">★</span>
-                        <span id="rating-text" class="ms-2 text-white-50" style="font-size: 0.9rem;">
-                            {{ "%.1f"|format(band_page.rating) if band_page.rating > 0 else "No ratings" }} ({{ band_page.votes }})
-                        </span>
+                    
+                    <div class="rating-container ms-3" id="star-rating" data-page-id="{{ band_page.id }}" data-band-rating="{{ band_page.rating }}">
+                        <span class="star" data-value="1">★</span>
+                        <span class="star" data-value="2">★</span>
+                        <span class="star" data-value="3">★</span>
+                        <span class="star" data-value="4">★</span>
+                        <span class="star" data-value="5">★</span>
+                    </div>
+                    <span id="rating-text" class="ms-2 text-white-50" style="font-size: 0.9rem;">
+                        {{ "%.1f"|format(band_page.rating) if band_page.rating > 0 else "0.0" }} ({{ band_page.votes }})
                     </span>
-                    <span class="text-white-50 ms-3">{{ band_page.views }} {{ txt.views }}</span>
+                    
+                    <br>
+                    <small class="text-white-50">{{ band_page.views }} {{ txt.views }}</small>
                 </div>
                 
                 {% if band_page.description %}
-                <div class="alert alert-secondary text-center mb-4">
-                    {{ band_page.description }}
+                <div class="mb-4">
+                    <h3 class="page-title mb-3">{{ txt.about_band }}</h3>
+                    <p class="text-white-50">{{ band_page.description }}</p>
                 </div>
                 {% endif %}
                 
                 {% if band_page.track1_path or band_page.track2_path or band_page.track3_path %}
                 <div class="music-section mb-4">
-                    <h3 class="text-center mb-3" style="color: #9d4edd;">{{ txt.tracks }}</h3>
+                    <h3 class="page-title mb-3">{{ txt.tracks }}</h3>
                     <div class="track-list">
                         {% for i in range(1, 4) %}
                         {% set track_path = band_page['track' ~ i ~ '_path'] %}
                         {% set track_name = band_page['track' ~ i ~ '_name'] %}
                         {% if track_path %}
                         <div class="track-item" onclick="playTrack('{{ track_path }}', '{{ track_name or 'Track ' ~ i }}')">
-                            <span class="track-play-btn">PLAY</span>
+                            <div class="track-play-btn">▶</div>
                             <span class="track-name">{{ track_name or 'Track ' ~ i }}</span>
                         </div>
                         {% endif %}
                         {% endfor %}
                     </div>
-                    <audio id="audioPlayer" style="width: 100%; margin-top: 15px;" controls>
+                    <audio id="audioPlayer" controls style="display:none; margin-top: 15px;">
                         <source src="" type="audio/mpeg">
                         Your browser does not support audio.
                     </audio>
@@ -56,16 +59,20 @@
                 {% endif %}
                 
                 {% if band_page.content %}
-                <div class="content-section mb-4 p-3" style="background: rgba(0,0,0,0.2); border-radius: 15px;">
-                    {{ band_page.content | safe }}
+                <div class="content-section mb-4">
+                    <h3 class="page-title mb-3">{{ txt.content }}</h3>
+                    <div>{{ band_page.content | safe }}</div>
                 </div>
                 {% endif %}
                 
-                <div class="d-grid gap-2">
+                <div class="text-center mt-4">
                     {% if session.get('user_id') == band.band_id %}
-                    <a href="{{ url_for('edit_band_page', page_id=band_page.id) }}" class="btn-back text-center">{{ txt.edit_page }}</a>
+                    <a href="{{ url_for('edit_band_page', page_id=band_page.id) }}" class="btn-back me-2">{{ txt.edit_page }}</a>
                     {% endif %}
-                    <a href="{{ url_for('index') }}" class="btn-back text-center">{{ txt.back }}</a>
+                    {% if session.get('role') == 'admin' %}
+                    <a href="{{ url_for('delete_band_page', page_id=band_page.id) }}" class="btn-back me-2" style="background: rgba(220, 53, 69, 0.15); border-color: #dc3545; color: #dc3545;" onclick="return confirm('{{ txt.confirm_delete }}')">{{ txt.delete_page }}</a>
+                    {% endif %}
+                    <a href="{{ url_for('index') }}" class="btn-back">{{ txt.back }}</a>
                 </div>
             </div>
         </div>
@@ -73,44 +80,48 @@
 </div>
 
 <script>
+document.addEventListener('DOMContentLoaded', function() {
+    const container = document.getElementById('star-rating');
+    if (!container) return;
+    const pageId = container.dataset.pageId;
+    const bandRating = parseFloat(container.dataset.bandRating) || 0;
+    const ratingText = document.getElementById('rating-text');
+    let currentRating = bandRating;
+
+    function renderStars(rating) {
+        container.querySelectorAll('.star').forEach((star, i) => {
+            star.classList.remove('active');
+            star.style.clipPath = 'none';
+            if (rating >= i + 1) star.classList.add('active');
+            else if (rating >= i + 0.5) {
+                star.classList.add('active');
+                star.style.clipPath = 'inset(0 50% 0 0)';
+            }
+        });
+    }
+
+    fetch(`/api/user_rating/${pageId}`)
+        .then(r => r.json())
+        .then(d => { if(d.user_rating > 0) currentRating = d.user_rating; renderStars(currentRating); });
+
+    container.addEventListener('click', function(e) {
+        const star = e.target.closest('.star');
+        if (!star) return;
+        const value = parseInt(star.dataset.value);
+        fetch(`/api/rate_band/${pageId}`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({score: value}) })
+        .then(r => { if(r.status === 401) { alert("{{ txt.login_to_search }}"); return; } return r.json(); })
+        .then(d => { if(d) { currentRating = value; renderStars(currentRating); ratingText.textContent = `${d.new_rating.toFixed(1)} (${d.votes})`; } });
+    });
+
+    renderStars(currentRating);
+});
+
 function playTrack(src, name) {
     const player = document.getElementById('audioPlayer');
     player.src = src;
     player.play();
     player.scrollIntoView({ behavior: 'smooth', block: 'center' });
-}
-
-const stars = document.querySelectorAll('.star');
-stars.forEach(star => {
-    star.addEventListener('mouseover', function() { highlightStars(this.dataset.value); });
-    star.addEventListener('mouseout', function() { resetStars(); });
-});
-function highlightStars(value) {
-    stars.forEach(s => s.style.color = s.dataset.value <= value ? '#ffc107' : 'rgba(255,255,255,0.3)');
-}
-function resetStars() {
-    stars.forEach(s => s.style.color = 'rgba(255,255,255,0.3)');
-}
-const currentRating = {{ band_page.rating }};
-if (currentRating > 0) {
-    stars.forEach(s => {
-        if (parseInt(s.dataset.value) <= Math.round(currentRating)) s.style.color = '#ffc107';
-    });
-}
-function rateBand(score) {
-    highlightStars(score);
-    fetch(`/api/rate_band/{{ band_page.id }}`, {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({ score: score })
-    })
-    .then(r => r.json())
-    .then(data => {
-        if (data.new_rating !== undefined) {
-            document.getElementById('rating-text').innerText = `${data.new_rating.toFixed(1)} (${data.votes})`;
-        } else { alert(data.error || 'Error'); }
-    })
-    .catch(e => console.error('Error:', e));
+    document.getElementById('player-wrapper').classList.add('active');
 }
 </script>
 {% endblock %}

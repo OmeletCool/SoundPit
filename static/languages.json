@@ -84,7 +84,17 @@
         "no_new_bands": "Новых групп пока нет",
         "tracks": "ТРЕКИ",
         "track_name_placeholder": "Название трека",
-        "upload_audio_hint": "MP3, WAV, OGG до 10МБ"
+        "upload_audio_hint": "MP3, WAV, OGG до 10МБ",
+        "field_required": "Пожалуйста, заполните это поле",
+        "invalid_login_length": "Логин должен быть не менее 3 символов",
+        "file_too_large": "Файл превышает максимальный размер",
+        "invalid_file_type": "Недопустимый тип файла",
+        "view_page": "Посмотреть страницу",
+        "delete_page": "Удалить страницу",
+        "delete_band": "Удалить группу",
+        "confirm_delete": "Вы уверены? Это действие нельзя отменить.",
+        "page_deleted": "Страница группы удалена",
+        "band_deleted": "Группа удалена"
     },
     "en": {
         "login": "LOGIN",
@@ -171,7 +181,17 @@
         "no_new_bands": "No new bands yet",
         "tracks": "TRACKS",
         "track_name_placeholder": "Track name",
-        "upload_audio_hint": "MP3, WAV, OGG up to 10MB"
+        "upload_audio_hint": "MP3, WAV, OGG up to 10MB",
+        "field_required": "Please fill out this field",
+        "invalid_login_length": "Username must be at least 3 characters",
+        "file_too_large": "File exceeds maximum size",
+        "invalid_file_type": "Invalid file type",
+        "view_page": "View Page",
+        "delete_page": "Delete Page",
+        "delete_band": "Delete Band",
+        "confirm_delete": "Are you sure? This action cannot be undone.",
+        "page_deleted": "Band page deleted",
+        "band_deleted": "Band deleted"
     },
     "sq": {
         "login": "HYRJE",
@@ -258,6 +278,16 @@
         "no_new_bands": "Ende banda të reja",
         "tracks": "PËRGJIMET",
         "track_name_placeholder": "Emri i këngës",
-        "upload_audio_hint": "MP3, WAV, OGG deri në 10MB"
+        "upload_audio_hint": "MP3, WAV, OGG deri në 10MB",
+        "field_required": "Ju lutemi plotësoni këtë fushë",
+        "invalid_login_length": "Emri i përdoruesit duhet të jetë të paktën 3 karaktere",
+        "file_too_large": "Skedari kalon madhësinë maksimale",
+        "invalid_file_type": "Lloj i pavlefshëm skedari",
+        "view_page": "Shiko Faqen",
+        "delete_page": "Fshi Faqen",
+        "delete_band": "Fshi Bandën",
+        "confirm_delete": "A jeni i sigurt? Ky veprim nuk mund të zhbëhet.",
+        "page_deleted": "Faqja e bandës u fshi",
+        "band_deleted": "Banda u fshi"
     }
 }
