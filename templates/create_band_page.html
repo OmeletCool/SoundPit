@@ -25,6 +25,24 @@
                     <div class="mb-3">
                         <label class="text-white-50">{{ txt.cover_image }}</label>
                         <input type="file" name="cover_image" class="form-control" accept="image/*" style="background: #1a1a1a; color: white; border: 1px solid rgba(255,255,255,0.2);">
+                        <small class="text-white-50">PNG, JPG, WEBP up to 5MB</small>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="text-white-50 d-block mb-2">{{ txt.tracks }} (up to 3)</label>
+                        {% for i in range(1, 4) %}
+                        <div class="upload-box mb-2" style="padding: 10px;">
+                            <div class="row g-2 align-items-center">
+                                <div class="col-md-5">
+                                    <input type="text" name="track{{ i }}_name" class="input" placeholder="{{ txt.track_name_placeholder }} {{ i }}" style="height: 40px; font-size: 0.9rem;">
+                                </div>
+                                <div class="col-md-7">
+                                    <input type="file" name="track{{ i }}" class="form-control" accept="audio/*" style="background: #1a1a1a; color: white; border: 1px solid rgba(255,255,255,0.2); font-size: 0.85rem;">
+                                </div>
+                            </div>
+                            <small class="text-white-50">{{ txt.upload_audio_hint }}</small>
+                        </div>
+                        {% endfor %}
                     </div>
                     
                     <div class="d-grid gap-2">

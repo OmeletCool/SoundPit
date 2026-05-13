@@ -7,13 +7,13 @@
                 {% if session.get('user_id') and session.get('role') == 'band' %}
                 <div class="text-end mb-3">
                     {% if show_pending %}
-                    <button class="btn-back" id="pending-btn" onclick="togglePendingMessage()">✏️</button>
-                    <div id="pending-message" class="alert alert-warning mt-2 d-none">⚠️ {{ txt.pending_message }}</div>
+                    <button class="btn-back" id="pending-btn" onclick="togglePendingMessage()">EDIT</button>
+                    <div id="pending-message" class="alert alert-warning mt-2 d-none">{{ txt.pending_message }}</div>
                     {% elif band_page %}
-                    <a href="/band_page/{{ band_page.id }}/edit" class="btn-back">️ {{ txt.edit_page }}</a>
-                    <a href="/band_page/{{ band_page.id }}" class="btn-back ms-2">📄 {{ txt.my_page }}</a>
+                    <a href="/band_page/{{ band_page.id }}/edit" class="btn-back">{{ txt.edit_page }}</a>
+                    <a href="/band_page/{{ band_page.id }}" class="btn-back ms-2">{{ txt.my_page }}</a>
                     {% else %}
-                    <a href="/band_page/create" class="btn-back">➕ {{ txt.create_page }}</a>
+                    <a href="/band_page/create" class="btn-back">{{ txt.create_page }}</a>
                     {% endif %}
                 </div>
                 {% endif %}
@@ -25,51 +25,50 @@
                 </form>
             </div>
 
-            <!-- 🔄 ДВА РЕЙТИНГА РЯДОМ -->
-            <div class="ratings-row">
-                <!-- ЛЕВЫЙ: ТОП ПО РЕЙТИНГУ -->
-                <div class="rating-column">
-                    <h2 class="rating-title">🏆 ТОП ПО РЕЙТИНГУ</h2>
-                    {% if top_bands %}
-                    <div class="compact-list">
-                        {% for band in top_bands %}
-                        <a href="/band_page/{{ band.page_id }}" class="compact-item">
-                            {% if band.cover_image %}
-                            <img src="{{ band.cover_image }}" alt="{{ band.title }}" class="compact-cover">
-                            {% else %}
-                            <div class="compact-cover-placeholder">🎵</div>
-                            {% endif %}
-                            <div class="compact-info">
-                                <span class="compact-name">{{ band.title }}</span>
-                                <span class="compact-rating">⭐ {{ band.rating }} <small class="text-white-50">({{ band.votes }})</small></span>
-                            </div>
-                        </a>
-                        {% endfor %}
+            <div class="ratings-section">
+                <div class="ratings-row">
+                    <div class="rating-column">
+                        <h2 class="rating-title">{{ txt.top_bands_title }}</h2>
+                        {% if top_bands %}
+                        <div class="compact-list">
+                            {% for band in top_bands %}
+                            <a href="/band_page/{{ band.page_id }}" class="compact-item">
+                                {% if band.cover_image %}
+                                <img src="{{ band.cover_image }}" alt="{{ band.title }}" class="compact-cover">
+                                {% else %}
+                                <div class="compact-cover-placeholder">AUDIO</div>
+                                {% endif %}
+                                <div class="compact-info">
+                                    <span class="compact-name">{{ band.title }}</span>
+                                    <span class="compact-rating">{{ "%.1f"|format(band.rating) }} <small class="text-white-50">({{ band.votes }})</small></span>
+                                </div>
+                            </a>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <p class="text-white-50 text-center">{{ txt.no_ratings }}</p>
+                        {% endif %}
                     </div>
-                    {% else %}
-                    <p class="text-white-50 text-center">Пока нет оценок</p>
-                    {% endif %}
-                </div>
 
-                <!-- ПРАВЫЙ: НОВИНКИ / HOT -->
-                <div class="rating-column">
-                    <h2 class="rating-title">🔥 НОВИНКИ / HOT</h2>
-                    {% if hot_bands %}
-                    <div class="compact-list">
-                        {% for band in hot_bands %}
-                        <a href="/band_page/{{ band.page_id }}" class="compact-item">
-                            {% if band.cover_image %}
-                            <img src="{{ band.cover_image }}" alt="{{ band.title }}" class="compact-cover">
-                            {% else %}
-                            <div class="compact-cover-placeholder">🎵</div>
-                            {% endif %}
-                            <span class="compact-name">{{ band.title }}</span>
-                        </a>
-                        {% endfor %}
+                    <div class="rating-column">
+                        <h2 class="rating-title">{{ txt.hot_bands_title }}</h2>
+                        {% if hot_bands %}
+                        <div class="compact-list">
+                            {% for band in hot_bands %}
+                            <a href="/band_page/{{ band.page_id }}" class="compact-item">
+                                {% if band.cover_image %}
+                                <img src="{{ band.cover_image }}" alt="{{ band.title }}" class="compact-cover">
+                                {% else %}
+                                <div class="compact-cover-placeholder">AUDIO</div>
+                                {% endif %}
+                                <span class="compact-name">{{ band.title }}</span>
+                            </a>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <p class="text-white-50 text-center">{{ txt.no_new_bands }}</p>
+                        {% endif %}
                     </div>
-                    {% else %}
-                    <p class="text-white-50 text-center">Новых групп пока нет</p>
-                    {% endif %}
                 </div>
             </div>
         </div>

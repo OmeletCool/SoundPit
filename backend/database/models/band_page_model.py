@@ -19,11 +19,19 @@ class BandPageModel(SqlAlchemyBase):
     content = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     cover_image = sqlalchemy.Column(sqlalchemy.String, nullable=True)
 
+    track1_path = sqlalchemy.Column(sqlalchemy.String, nullable=True)
+    track1_name = sqlalchemy.Column(sqlalchemy.String, nullable=True)
+    track2_path = sqlalchemy.Column(sqlalchemy.String, nullable=True)
+    track2_name = sqlalchemy.Column(sqlalchemy.String, nullable=True)
+    track3_path = sqlalchemy.Column(sqlalchemy.String, nullable=True)
+    track3_name = sqlalchemy.Column(sqlalchemy.String, nullable=True)
+
     created_date = sqlalchemy.Column(
         sqlalchemy.DateTime, default=datetime.datetime.now)
     updated_date = sqlalchemy.Column(
         sqlalchemy.DateTime, default=datetime.datetime.now, onupdate=datetime.datetime.now)
 
+    views = sqlalchemy.Column(sqlalchemy.Integer, default=0)
     rating = sqlalchemy.Column(sqlalchemy.Float, default=0.0)
     votes = sqlalchemy.Column(sqlalchemy.Integer, default=0)
     

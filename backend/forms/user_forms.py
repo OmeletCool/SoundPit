@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
 from wtforms import StringField, PasswordField, TextAreaField, SubmitField, EmailField
-from wtforms.validators import DataRequired, Optional
+from wtforms.validators import DataRequired, Email, EqualTo, Optional
 
 
 class LoginForm(FlaskForm):
@@ -11,10 +11,16 @@ class LoginForm(FlaskForm):
 
 
 class RegisterForm(FlaskForm):
-    username = StringField('Логин', validators=[DataRequired()])  # Вернули!
+    username = StringField('Логин', validators=[DataRequired()])
     email = EmailField('Email', validators=[DataRequired()])
     name = StringField('Имя / Название группы', validators=[DataRequired()])
     password = PasswordField('Пароль', validators=[DataRequired()])
+    
+    password_again = PasswordField('Повторите пароль', validators=[
+        DataRequired(), 
+        EqualTo('password', message='Пароли должны совпадать')
+    ])
+    
     about = TextAreaField('О себе / О группе')
     inn = StringField('ИНН', validators=[Optional()])
     rkn_number = StringField('Регистрационный номер РКН', validators=[Optional()])

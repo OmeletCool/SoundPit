@@ -22,6 +22,11 @@ class UserModel(SqlAlchemyBase):
     inn = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     rkn_number = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     docs_path = sqlalchemy.Column(sqlalchemy.String, nullable=True)
+    
+    # 🔥 ДОБАВЛЕНО: Поля представителя для групп
+    rep_name = sqlalchemy.Column(sqlalchemy.String, nullable=True)
+    rep_email = sqlalchemy.Column(sqlalchemy.String, nullable=True)
+    
     status = sqlalchemy.Column(sqlalchemy.String, default='active')
 
     hashed_password = sqlalchemy.Column(sqlalchemy.String, nullable=True)

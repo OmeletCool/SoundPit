@@ -76,7 +76,15 @@
         "cover_image": "Обложка",
         "save_changes": "Сохранить изменения",
         "views": "просмотров",
-        "no_results": "Ничего не найдено"
+        "no_results": "Ничего не найдено",
+        "username_length": "Логин должен быть от 3 символов",
+        "top_bands_title": "ТОП ПО РЕЙТИНГУ",
+        "hot_bands_title": "НОВИНКИ",
+        "no_ratings": "Пока нет оценок",
+        "no_new_bands": "Новых групп пока нет",
+        "tracks": "ТРЕКИ",
+        "track_name_placeholder": "Название трека",
+        "upload_audio_hint": "MP3, WAV, OGG до 10МБ"
     },
     "en": {
         "login": "LOGIN",
@@ -155,7 +163,15 @@
         "cover_image": "Cover Image",
         "save_changes": "Save Changes",
         "views": "views",
-        "no_results": "No results found"
+        "no_results": "No results found",
+        "username_length": "Username must be at least 3 characters",
+        "top_bands_title": "TOP RATED",
+        "hot_bands_title": "NEW RELEASES",
+        "no_ratings": "No ratings yet",
+        "no_new_bands": "No new bands yet",
+        "tracks": "TRACKS",
+        "track_name_placeholder": "Track name",
+        "upload_audio_hint": "MP3, WAV, OGG up to 10MB"
     },
     "sq": {
         "login": "HYRJE",
@@ -234,6 +250,14 @@
         "cover_image": "Imazhi i Kopertinës",
         "save_changes": "Ruaj Ndryshimet",
         "views": "shikime",
-        "no_results": "Asnjë rezultat"
+        "no_results": "Asnjë rezultat",
+        "username_length": "Emri i përdoruesit duhet të jetë të paktën 3 karaktere",
+        "top_bands_title": "TOP RENDIMENTI",
+        "hot_bands_title": "RILINDJET E REJA",
+        "no_ratings": "Ende pa vlerësime",
+        "no_new_bands": "Ende banda të reja",
+        "tracks": "PËRGJIMET",
+        "track_name_placeholder": "Emri i këngës",
+        "upload_audio_hint": "MP3, WAV, OGG deri në 10MB"
     }
 }

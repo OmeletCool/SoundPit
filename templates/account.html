@@ -32,9 +32,9 @@
                     <th>{{ txt.status }}:</th>
                     <td>
                         {% if user.status == 'pending' %}
-                        <span class="status-badge pending">⏳ {{ txt.pending }}</span>
+                        <span class="status-badge pending">{{ txt.pending }}</span>
                         {% else %}
-                        <span class="status-badge certified">✓ {{ txt.certified }}</span>
+                        <span class="status-badge certified">{{ txt.certified }}</span>
                         {% endif %}
                     </td>
                 </tr>

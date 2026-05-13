@@ -13,9 +13,7 @@
                 <h1 class="gradient-title text-center mb-3">{{ band_page.title or band.name }}</h1>
                 
                 <div class="text-center mb-4">
-                    <span class="status-badge certified">✓ {{ txt.certified }}</span>
-                    
-                    <!-- Система рейтинга -->
+                    <span class="status-badge certified">{{ txt.certified }}</span>
                     <span class="rating-container ms-3">
                         <span class="star" data-value="1" onclick="rateBand(1)">★</span>
                         <span class="star" data-value="2" onclick="rateBand(2)">★</span>
@@ -23,16 +21,37 @@
                         <span class="star" data-value="4" onclick="rateBand(4)">★</span>
                         <span class="star" data-value="5" onclick="rateBand(5)">★</span>
                         <span id="rating-text" class="ms-2 text-white-50" style="font-size: 0.9rem;">
-                            {{ "%.1f"|format(band_page.rating) if band_page.rating > 0 else "Нет оценок" }} ({{ band_page.votes }})
+                            {{ "%.1f"|format(band_page.rating) if band_page.rating > 0 else "No ratings" }} ({{ band_page.votes }})
                         </span>
                     </span>
-
-                    <span class="text-white-50 ms-3"> {{ band_page.created_date.strftime('%d.%m.%Y') if band_page.created_date else '' }}</span>
+                    <span class="text-white-50 ms-3">{{ band_page.views }} {{ txt.views }}</span>
                 </div>
                 
                 {% if band_page.description %}
                 <div class="alert alert-secondary text-center mb-4">
                     {{ band_page.description }}
+                </div>
+                {% endif %}
+                
+                {% if band_page.track1_path or band_page.track2_path or band_page.track3_path %}
+                <div class="music-section mb-4">
+                    <h3 class="text-center mb-3" style="color: #9d4edd;">{{ txt.tracks }}</h3>
+                    <div class="track-list">
+                        {% for i in range(1, 4) %}
+                        {% set track_path = band_page['track' ~ i ~ '_path'] %}
+                        {% set track_name = band_page['track' ~ i ~ '_name'] %}
+                        {% if track_path %}
+                        <div class="track-item" onclick="playTrack('{{ track_path }}', '{{ track_name or 'Track ' ~ i }}')">
+                            <span class="track-play-btn">PLAY</span>
+                            <span class="track-name">{{ track_name or 'Track ' ~ i }}</span>
+                        </div>
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                    <audio id="audioPlayer" style="width: 100%; margin-top: 15px;" controls>
+                        <source src="" type="audio/mpeg">
+                        Your browser does not support audio.
+                    </audio>
                 </div>
                 {% endif %}
                 
@@ -54,61 +73,44 @@
 </div>
 
 <script>
+function playTrack(src, name) {
+    const player = document.getElementById('audioPlayer');
+    player.src = src;
+    player.play();
+    player.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
 const stars = document.querySelectorAll('.star');
 stars.forEach(star => {
-    star.addEventListener('mouseover', function() {
-        highlightStars(this.dataset.value);
-    });
-    star.addEventListener('mouseout', function() {
-        resetStars();
-    });
+    star.addEventListener('mouseover', function() { highlightStars(this.dataset.value); });
+    star.addEventListener('mouseout', function() { resetStars(); });
 });
-
 function highlightStars(value) {
-    stars.forEach(s => {
-        if (s.dataset.value <= value) {
-            s.style.color = '#ffc107';
-        } else {
-            s.style.color = 'rgba(255,255,255,0.3)';
-        }
-    });
+    stars.forEach(s => s.style.color = s.dataset.value <= value ? '#ffc107' : 'rgba(255,255,255,0.3)');
 }
-
 function resetStars() {
-    stars.forEach(s => {
-        s.style.color = 'rgba(255,255,255,0.3)'; 
-    });
+    stars.forEach(s => s.style.color = 'rgba(255,255,255,0.3)');
 }
-
 const currentRating = {{ band_page.rating }};
 if (currentRating > 0) {
     stars.forEach(s => {
-        if (parseInt(s.dataset.value) <= Math.round(currentRating)) {
-            s.style.color = '#ffc107';
-        }
+        if (parseInt(s.dataset.value) <= Math.round(currentRating)) s.style.color = '#ffc107';
     });
 }
-
 function rateBand(score) {
     highlightStars(score);
-    
     fetch(`/api/rate_band/{{ band_page.id }}`, {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
+        headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({ score: score })
     })
-    .then(response => response.json())
+    .then(r => r.json())
     .then(data => {
         if (data.new_rating !== undefined) {
-            document.getElementById('rating-text').innerText = 
-                `${data.new_rating.toFixed(1)} (${data.votes})`;
-        } else {
-            alert(data.error || 'Ошибка');
-        }
+            document.getElementById('rating-text').innerText = `${data.new_rating.toFixed(1)} (${data.votes})`;
+        } else { alert(data.error || 'Error'); }
     })
-    .catch(error => console.error('Error:', error));
+    .catch(e => console.error('Error:', e));
 }
 </script>
 {% endblock %}

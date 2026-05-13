@@ -10,8 +10,6 @@ class UserRating(SqlAlchemyBase):
     band_page_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("band_pages.id"), nullable=False)
     score = sqlalchemy.Column(sqlalchemy.Integer, nullable=False)
 
-    # Уникальная связка: один пользователь — одна оценка на страницу
     __table_args__ = (
         sqlalchemy.UniqueConstraint('user_id', 'band_page_id', name='_user_band_uc'),
     )
-    # Убрали back_populates, чтобы не ломало существующие модели
