@@ -765,7 +765,6 @@ def edit_band_page(page_id):
         band_page.content = request.form.get('content', '').strip()
         band_page.updated_date = datetime.datetime.now()
 
-        # Обложка
         if request.files.get('cover_image'):
             file = request.files.get('cover_image')
             if file and file.filename:
@@ -777,12 +776,10 @@ def edit_band_page(page_id):
                 file.save(file_path)
                 band_page.cover_image = f"/static/images/band_covers/{session['user_id']}_{filename}"
 
-        # Треки
         for i in range(1, 4):
             track_file = request.files.get(f'track{i}')
             track_name = request.form.get(f'track{i}_name', '').strip()
 
-            # 1. Если загружен НОВЫЙ файл
             if track_file and track_file.filename and allowed_file_audio(track_file.filename):
                 filename = secure_filename(track_file.filename)
                 music_folder = os.path.join('static', 'music', 'tracks')
@@ -795,18 +792,15 @@ def edit_band_page(page_id):
                         f"/static/music/tracks/{new_filename}")
                 setattr(band_page, f'track{i}_name', track_name or filename)
 
-            # 2. Если файл НЕ загружен, но имя изменено (ИСПРАВЛЕНО: теперь работает всегда)
             elif track_name:
                 setattr(band_page, f'track{i}_name', track_name)
 
         db_sess.commit()
         db_sess.close()
 
-        # 🔥 УВЕДОМЛЕНИЕ ОБ УСПЕХЕ
         flash(get_txt('save_changes', 'Изменения успешно сохранены!'), 'success')
         logger.info(f"IP: {ip} - страница {page_id} отредактирована")
 
-        # 🔥 Остаёмся на странице редактирования, чтобы увидеть flash-сообщение
         return redirect(url_for('edit_band_page', page_id=page_id))
 
     db_sess.close()
@@ -856,7 +850,6 @@ def delete_band_page(page_id):
     flash("Страница успешно удалена", 'success')
     logger.info(f"IP: {ip} - страница {page_id} удалена")
 
-    # Если удалил админ - в админку, если группа - на главную
     if is_admin:
         return redirect(url_for('developers'))
     else:
