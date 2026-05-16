@@ -237,11 +237,6 @@ body {
     position: relative;
 }
 
-.search-form {
-    position: relative;
-    width: 100%;
-}
-
 .input {
     background-color: #1a1a1a;
     width: 100%;
@@ -443,10 +438,7 @@ body {
     --color: #afffff;
     color: var(--color);
     cursor: pointer;
-    position: absolute;
-    right: 10px;
-    top: 50%;
-    transform: translateY(-50%);
+    position: relative;
     isolation: isolate;
     display: inline-grid;
     place-content: center;
