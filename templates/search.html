@@ -7,7 +7,7 @@
             <!-- Поисковая строка -->
             <div class="card-home">
                 <div class="search-container">
-                    <form action="{{ url_for('search') }}" method="GET" id="searchForm">
+                    <form action="{{ url_for('search') }}" method="GET" id="searchForm" class="search-form">
                         <input type="text" name="q" id="searchInput" class="input" 
                                placeholder="{{ txt.search_place }}" autocomplete="off"
                                value="{{ query }}">
